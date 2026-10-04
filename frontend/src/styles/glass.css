@@ -1,0 +1,536 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   MONTRA GLOSSY GLASS DESIGN SYSTEM
+   Liquid Glass • Specular Highlights • Glass Tiers 1-4 • Translucent Depth
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Montra Brand Environmental Tones */
+  --montra-lavender: #EDEBF7;
+  --montra-cyan: #E6F7F6;
+  --montra-cream: #FAF8EB;
+  --montra-lime: #F6FCE4;
+  --montra-mint: #E6F7E4;
+  --montra-soft-green: #D7F2E6;
+  --montra-bg: #FEFFF2;
+  --montra-text: #202124;
+  --montra-text-muted: #6B7280;
+  --montra-violet: #7C5CFC;
+  --montra-emerald: #10B981;
+
+  /* Glass Specular Glare */
+  --glass-specular-light: linear-gradient(120deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.03) 40%, rgba(255, 255, 255, 0.18) 100%);
+  --glass-specular-dark: linear-gradient(120deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.01) 40%, rgba(255, 255, 255, 0.06) 100%);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   GLASS LEVEL 1 — LIGHT GLASS
+   Usage: Secondary surfaces, small badges, transaction list rows, chips
+   ───────────────────────────────────────────────────────────────────────── */
+.glass-1 {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(14px) saturate(170%);
+  -webkit-backdrop-filter: blur(14px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 
+    0 4px 16px -2px rgba(31, 38, 135, 0.04),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .glass-1 {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(14px) saturate(170%);
+  -webkit-backdrop-filter: blur(14px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 
+    0 6px 18px 0 rgba(0, 0, 0, 0.25),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   GLASS LEVEL 2 — MEDIUM GLASS (Core Workhorse)
+   Usage: Dashboard cards, section cards, forms, stat metrics, charts
+   ───────────────────────────────────────────────────────────────────────── */
+.glass-2 {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 255, 255, 0.62) 50%,
+    rgba(255, 255, 255, 0.82) 100%
+  );
+  backdrop-filter: blur(22px) saturate(190%);
+  -webkit-backdrop-filter: blur(22px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.90);
+  box-shadow: 
+    0 14px 34px -4px rgba(31, 38, 135, 0.07),
+    0 4px 12px -2px rgba(31, 38, 135, 0.03),
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 1),
+    inset 0 -1.5px 2px 0 rgba(124, 92, 252, 0.04);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .glass-2 {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.09) 0%,
+    rgba(255, 255, 255, 0.035) 50%,
+    rgba(255, 255, 255, 0.065) 100%
+  );
+  backdrop-filter: blur(22px) saturate(190%);
+  -webkit-backdrop-filter: blur(22px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 18px 42px 0 rgba(0, 0, 0, 0.48),
+    0 4px 12px 0 rgba(0, 0, 0, 0.22),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.20),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Glass Card Interactive Lift & Glow */
+.glass-card {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 255, 255, 0.62) 50%,
+    rgba(255, 255, 255, 0.82) 100%
+  );
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  box-shadow: 
+    0 14px 34px -4px rgba(31, 38, 135, 0.07),
+    0 4px 10px -2px rgba(31, 38, 135, 0.03),
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 2px 0 rgba(16, 185, 129, 0.04);
+  transition: all 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 1);
+  box-shadow: 
+    0 22px 48px -4px rgba(31, 38, 135, 0.12),
+    0 8px 18px -2px rgba(124, 92, 252, 0.08),
+    inset 0 2px 4px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 2px 0 rgba(124, 92, 252, 0.08);
+}
+
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+.dark .glass-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.09) 0%,
+    rgba(255, 255, 255, 0.035) 50%,
+    rgba(255, 255, 255, 0.065) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 18px 42px 0 rgba(0, 0, 0, 0.52),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.18);
+}
+
+.dark .glass-card::before {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+  opacity: 0.5;
+}
+
+.dark .glass-card:hover {
+  transform: translateY(-3px);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.13) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.09) 100%
+  );
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 
+    0 24px 54px 0 rgba(0, 0, 0, 0.65),
+    0 8px 20px 0 rgba(124, 92, 252, 0.12),
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.28);
+}
+
+.dark .glass-card:hover::before {
+  opacity: 0.8;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   GLASS LEVEL 3 — STRONG GLASS
+   Usage: Modals, Slide Panels, Dropdown menus, Popovers, Auth Cards
+   ───────────────────────────────────────────────────────────────────────── */
+.glass-3,
+.glass-modal,
+.glass-dropdown {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.94) 0%,
+    rgba(250, 252, 255, 0.84) 50%,
+    rgba(255, 255, 255, 0.92) 100%
+  );
+  backdrop-filter: blur(32px) saturate(210%);
+  -webkit-backdrop-filter: blur(32px) saturate(210%);
+  border: 1px solid rgba(255, 255, 255, 0.96);
+  box-shadow: 
+    0 28px 68px -10px rgba(31, 38, 135, 0.14),
+    0 8px 24px -4px rgba(31, 38, 135, 0.06),
+    inset 0 2px 3px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 3px 0 rgba(124, 92, 252, 0.05);
+}
+
+.dark .glass-3,
+.dark .glass-modal,
+.dark .glass-dropdown {
+  background: linear-gradient(
+    135deg,
+    rgba(28, 30, 40, 0.88) 0%,
+    rgba(17, 19, 27, 0.92) 50%,
+    rgba(24, 26, 36, 0.90) 100%
+  );
+  backdrop-filter: blur(32px) saturate(210%);
+  -webkit-backdrop-filter: blur(32px) saturate(210%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 
+    0 32px 72px 0 rgba(0, 0, 0, 0.70),
+    0 8px 24px 0 rgba(0, 0, 0, 0.40),
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   GLASS LEVEL 4 — FLOATING GLASS / HERO
+   Usage: Hero financial cards, floating glass navbar, high-priority CTAs
+   ───────────────────────────────────────────────────────────────────────── */
+.glass-4,
+.glass-nav {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.86) 0%,
+    rgba(255, 255, 255, 0.60) 45%,
+    rgba(246, 252, 228, 0.45) 80%,
+    rgba(230, 247, 246, 0.60) 100%
+  );
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  box-shadow: 
+    0 20px 48px -8px rgba(31, 38, 135, 0.09),
+    0 4px 14px -2px rgba(16, 185, 129, 0.05),
+    inset 0 2px 3px 0 rgba(255, 255, 255, 1),
+    inset 0 -1.5px 2px 0 rgba(124, 92, 252, 0.06);
+}
+
+.dark .glass-4,
+.dark .glass-nav {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.11) 0%,
+    rgba(255, 255, 255, 0.04) 45%,
+    rgba(16, 185, 129, 0.05) 80%,
+    rgba(124, 92, 252, 0.07) 100%
+  );
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 
+    0 24px 54px 0 rgba(0, 0, 0, 0.55),
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.22);
+}
+
+/* Floating Navigation Bar with subtle border glow */
+.glass-nav-floating {
+  border-radius: 9999px;
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   GLOSSY SPECULAR HIGHLIGHT
+   Diagonal reflection across major surfaces that feels like genuine polished glass
+   ───────────────────────────────────────────────────────────────────────── */
+.glossy-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.glossy-panel::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.28) 0%,
+    transparent 35%,
+    rgba(255, 255, 255, 0.06) 65%,
+    transparent 100%
+  );
+  pointer-events: none;
+  opacity: 0.7;
+  transform: rotate(25deg);
+  transition: opacity 0.3s ease;
+}
+
+.dark .glossy-panel::after {
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    transparent 35%,
+    rgba(255, 255, 255, 0.03) 65%,
+    transparent 100%
+  );
+  opacity: 0.5;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   GLASS INPUTS (Glass-inside-glass)
+   Subtle transparent surface, crisp typography, soft glow focus ring
+   ───────────────────────────────────────────────────────────────────────── */
+.glass-input {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  color: var(--montra-text);
+  box-shadow: 
+    inset 0 1px 2px 0 rgba(0, 0, 0, 0.03),
+    0 1px 2px 0 rgba(0, 0, 0, 0.02);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-input:hover {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(255, 255, 255, 1);
+}
+
+.glass-input:focus,
+.glass-input:focus-within {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(124, 92, 252, 0.75);
+  box-shadow: 
+    0 0 0 3.5px rgba(124, 92, 252, 0.18),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.8);
+  outline: none;
+}
+
+.glass-input-error {
+  border-color: rgba(239, 68, 68, 0.7) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16) !important;
+}
+
+.glass-input-success {
+  border-color: rgba(16, 185, 129, 0.7) !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.16) !important;
+}
+
+.dark .glass-input {
+  background: rgba(0, 0, 0, 0.30);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #F3F4F6;
+  box-shadow: 
+    inset 0 1px 2px 0 rgba(0, 0, 0, 0.4),
+    0 1px 2px 0 rgba(0, 0, 0, 0.15);
+}
+
+.dark .glass-input:hover {
+  background: rgba(0, 0, 0, 0.40);
+  border-color: rgba(255, 255, 255, 0.20);
+}
+
+.dark .glass-input:focus,
+.dark .glass-input:focus-within {
+  background: rgba(0, 0, 0, 0.50);
+  border-color: rgba(167, 139, 250, 0.8);
+  box-shadow: 
+    0 0 0 3.5px rgba(124, 92, 252, 0.25),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.08);
+  outline: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   GLASS TOOLTIP (Recharts Tooltip)
+   ───────────────────────────────────────────────────────────────────────── */
+.glass-tooltip {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(250, 252, 255, 0.88) 100%
+  );
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 
+    0 12px 28px -4px rgba(31, 38, 135, 0.12),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 1);
+  border-radius: 14px;
+}
+
+.dark .glass-tooltip {
+  background: linear-gradient(
+    135deg,
+    rgba(26, 28, 38, 0.92) 0%,
+    rgba(16, 18, 26, 0.95) 100%
+  );
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 
+    0 14px 32px 0 rgba(0, 0, 0, 0.6),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   GLASS TABLE & LIST CONTAINERS
+   Maintains high readability for financial numbers
+   ───────────────────────────────────────────────────────────────────────── */
+.glass-table-container {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 255, 255, 0.65) 100%
+  );
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.90);
+  border-radius: 24px;
+  box-shadow: 
+    0 14px 34px -4px rgba(31, 38, 135, 0.07),
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 1);
+  overflow: hidden;
+}
+
+.dark .glass-table-container {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.035) 100%
+  );
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 24px;
+  box-shadow: 
+    0 18px 42px 0 rgba(0, 0, 0, 0.5),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.18);
+}
+
+.glass-table-row {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.02);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-table-row:hover {
+  background: rgba(255, 255, 255, 0.90);
+  border-color: rgba(255, 255, 255, 1);
+  transform: translateY(-1.5px);
+  box-shadow: 
+    0 6px 16px 0 rgba(31, 38, 135, 0.06),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 1);
+}
+
+.dark .glass-table-row {
+  background: rgba(255, 255, 255, 0.045);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
+}
+
+.dark .glass-table-row:hover {
+  background: rgba(255, 255, 255, 0.085);
+  border-color: rgba(255, 255, 255, 0.20);
+  transform: translateY(-1.5px);
+  box-shadow: 
+    0 6px 18px 0 rgba(0, 0, 0, 0.35),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   FLOATING KEYFRAME ANIMATIONS (Subtle Ambient Motion)
+   ───────────────────────────────────────────────────────────────────────── */
+@keyframes floatSlow1 {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(0.5deg);
+  }
+}
+
+@keyframes floatSlow2 {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-0.5deg);
+  }
+}
+
+@keyframes floatSlow3 {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes ambientPulse {
+  0%, 100% {
+    opacity: 0.18;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.28;
+    transform: scale(1.08);
+  }
+}
+
+.animate-float-1 {
+  animation: floatSlow1 7s ease-in-out infinite;
+}
+
+.animate-float-2 {
+  animation: floatSlow2 8.5s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.animate-float-3 {
+  animation: floatSlow3 6s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+.animate-ambient-pulse {
+  animation: ambientPulse 10s ease-in-out infinite;
+}

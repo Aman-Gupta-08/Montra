@@ -1,0 +1,352 @@
+/* ==========================================================================
+   MONTRA CLIENT MESSAGES SIDEBAR — GLOSSY GLASS DESIGN
+   Matches exact class hierarchy:
+   .sidebar > .sidebar-header (.tools) > .messages > .message (.active) >
+   .message-body (.profile-img, .profile > .profile-name (Star.fav), .profile-text) >
+   .message-footer (.date)
+   ========================================================================== */
+
+.client-messages-sidebar,
+.sidebar.client-messages-sidebar,
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  max-width: 380px;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 1.5rem;
+  box-shadow: 
+    0 10px 30px -5px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(255, 255, 255, 0.4) inset;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+:is(.dark) .client-messages-sidebar,
+:is(.dark) .sidebar.client-messages-sidebar,
+:is(.dark) .sidebar {
+  background: rgba(18, 20, 29, 0.75);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 20px 40px -10px rgba(0, 0, 0, 0.5),
+    0 1px 0 0 rgba(255, 255, 255, 0.1) inset;
+}
+
+/* Glossy reflection on top of the sidebar */
+.client-messages-sidebar::before,
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 45%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, transparent 50%);
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+}
+
+:is(.dark) .client-messages-sidebar::before,
+:is(.dark) .sidebar::before {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+}
+
+/* ─── Header ─── */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.15rem 1.25rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  position: relative;
+  z-index: 2;
+}
+
+:is(.dark) .sidebar-header {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-header h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: -0.015em;
+  color: #1e1b4b;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+:is(.dark) .sidebar-header h2 {
+  color: #ffffff;
+}
+
+.sidebar-header .tools {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sidebar-header .tools button,
+.sidebar-header .tools svg {
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+:is(.dark) .sidebar-header .tools button,
+:is(.dark) .sidebar-header .tools svg {
+  color: #94a3b8;
+}
+
+.sidebar-header .tools svg:hover {
+  color: #7c3aed;
+  transform: scale(1.1);
+}
+
+:is(.dark) .sidebar-header .tools svg:hover {
+  color: #a78bfa;
+}
+
+/* ─── Messages List Container ─── */
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.85rem;
+  overflow-y: auto;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(124, 58, 237, 0.2) transparent;
+}
+
+.messages::-webkit-scrollbar {
+  width: 5px;
+}
+
+.messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.messages::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.2);
+  border-radius: 9999px;
+}
+
+/* ─── Individual Message Card ─── */
+.message {
+  display: flex;
+  flex-direction: column;
+  padding: 0.85rem 1rem;
+  border-radius: 1.15rem;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.03);
+}
+
+:is(.dark) .message {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.2);
+}
+
+.message:hover {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(124, 58, 237, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 20px -4px rgba(124, 58, 237, 0.08),
+    0 2px 6px -1px rgba(0, 0, 0, 0.04);
+}
+
+:is(.dark) .message:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(167, 139, 250, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 25px -4px rgba(0, 0, 0, 0.4),
+    0 0 15px 0 rgba(167, 139, 250, 0.1);
+}
+
+/* ─── Active Message Card ─── */
+.message.active {
+  background: linear-gradient(135deg, rgba(237, 235, 247, 0.9) 0%, rgba(230, 247, 246, 0.8) 100%);
+  border-color: rgba(124, 58, 237, 0.45);
+  box-shadow: 
+    0 10px 25px -5px rgba(124, 58, 237, 0.15),
+    0 0 0 1px rgba(124, 58, 237, 0.3) inset;
+  transform: scale(1.01);
+}
+
+:is(.dark) .message.active {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.22) 0%, rgba(16, 185, 129, 0.12) 100%);
+  border-color: rgba(167, 139, 250, 0.5);
+  box-shadow: 
+    0 12px 28px -5px rgba(0, 0, 0, 0.5),
+    0 0 20px 0 rgba(124, 58, 237, 0.25),
+    0 0 0 1px rgba(167, 139, 250, 0.3) inset;
+}
+
+/* Active indicator pill */
+.message.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 15%;
+  bottom: 15%;
+  width: 4px;
+  background: linear-gradient(to bottom, #7c3aed, #10b981);
+  border-radius: 0 4px 4px 0;
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.6);
+}
+
+/* ─── Message Body ─── */
+.message-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+/* ─── Profile Avatar ─── */
+.profile-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 0.85rem;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+:is(.dark) .profile-img {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.profile-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ─── Profile Info ─── */
+.profile {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.profile-name h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: -0.01em;
+  color: #111827;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:is(.dark) .profile-name h3 {
+  color: #f3f4f6;
+}
+
+/* ─── Favorite Star Icon ─── */
+.profile-name svg {
+  cursor: pointer;
+  color: #94a3b8;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+:is(.dark) .profile-name svg {
+  color: #64748b;
+}
+
+.profile-name svg:hover {
+  transform: scale(1.25) rotate(12deg);
+  color: #f59e0b;
+}
+
+.profile-name svg.fav {
+  fill: #f59e0b !important;
+  color: #f59e0b !important;
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.55));
+  transform: scale(1.1);
+}
+
+/* ─── Message Text Snippet ─── */
+.profile-text p {
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: #64748b;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+:is(.dark) .profile-text p {
+  color: #9ca3af;
+}
+
+.message.active .profile-text p {
+  color: #475569;
+}
+
+:is(.dark) .message.active .profile-text p {
+  color: #d1d5db;
+}
+
+/* ─── Message Footer ─── */
+.message-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+:is(.dark) .message-footer {
+  border-top-color: rgba(255, 255, 255, 0.04);
+}
+
+.message-footer .date {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.08);
+  padding: 0.15rem 0.55rem;
+  border-radius: 9999px;
+  letter-spacing: 0.01em;
+}
+
+:is(.dark) .message-footer .date {
+  color: #c4b5fd;
+  background: rgba(139, 92, 246, 0.2);
+}

@@ -1,0 +1,55 @@
+# Compiled Java / Maven artifacts
+target/
+*.jar
+*.war
+*.ear
+*.class
+.mvn/
+mvnw
+mvnw.cmd
+
+# Node / Frontend artifacts
+node_modules/
+dist/
+dist-ssr/
+
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+
+# Operating System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs and Editors
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/*
+!.vscode/extensions.json
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# Logs
+*.log
+logs/
+
+# Archives and user uploads
+*.zip
+*.tar.gz
+finora.zip
+uploads/
+storage/
