@@ -64,6 +64,13 @@ public class DatabaseConfig {
                 }
             }
 
+            // Clean user and password query parameters from JDBC URL to prevent parameter conflict
+            resolvedUrl = resolvedUrl
+                    .replaceAll("([?&])user=[^&]*(&|$)", "$1")
+                    .replaceAll("([?&])password=[^&]*(&|$)", "$1")
+                    .replaceAll("\\?&", "?")
+                    .replaceAll("[?&]$", "");
+
             // Supabase shared pooler requires postgres.<project-ref> username format
             if (resolvedUrl.contains(".pooler.supabase.com")) {
                 if ("postgres".equals(resolvedUsername) || resolvedUsername == null || resolvedUsername.isBlank()) {
@@ -77,8 +84,16 @@ public class DatabaseConfig {
             }
         }
 
+        // Auto-decode password in case percent-encoded characters (like %40 for @) were entered
+        if (resolvedPassword != null && resolvedPassword.contains("%")) {
+            try {
+                resolvedPassword = URLDecoder.decode(resolvedPassword, StandardCharsets.UTF_8);
+            } catch (Exception ignored) {
+            }
+        }
+
         log.info("Configuring DataSource for URL: {} with user: {}", 
-                resolvedUrl != null ? resolvedUrl.replaceAll("password=[^&]*", "password=***") : "null", 
+                resolvedUrl, 
                 resolvedUsername);
 
         HikariConfig hikariConfig = new HikariConfig();
