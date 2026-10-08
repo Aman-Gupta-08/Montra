@@ -2,6 +2,7 @@ package com.finora.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.pool.HikariPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,9 +53,15 @@ public class DatabaseConfig {
         }
 
         String resolvedPassword = System.getenv("DB_PASSWORD");
-        if (resolvedPassword == null || resolvedPassword.isBlank()) {
+        boolean passwordFromEnv = (resolvedPassword != null && !resolvedPassword.isBlank());
+        if (!passwordFromEnv) {
             String dbPassAlt = System.getenv("DATABASE_PASSWORD");
-            resolvedPassword = (dbPassAlt != null && !dbPassAlt.isBlank()) ? dbPassAlt : this.password;
+            if (dbPassAlt != null && !dbPassAlt.isBlank()) {
+                resolvedPassword = dbPassAlt;
+                passwordFromEnv = true;
+            } else {
+                resolvedPassword = this.password;
+            }
         }
 
         if (resolvedUrl != null) {
@@ -90,8 +97,9 @@ public class DatabaseConfig {
                 } catch (Exception e) {
                     extractedPass = passMatcher.group(1);
                 }
-                if (resolvedPassword == null || resolvedPassword.isBlank() || "password".equals(resolvedPassword)) {
+                if (!passwordFromEnv && (resolvedPassword == null || resolvedPassword.isBlank() || "password".equals(resolvedPassword))) {
                     resolvedPassword = extractedPass;
+                    passwordFromEnv = true;
                 }
             }
 
@@ -110,10 +118,12 @@ public class DatabaseConfig {
             }
         }
 
-        // Auto-decode password in case percent-encoded characters (like %40 for @) were provided
+        // Store raw and decoded password variations
+        String rawPassword = resolvedPassword;
+        String decodedPassword = resolvedPassword;
         if (resolvedPassword != null && resolvedPassword.contains("%")) {
             try {
-                resolvedPassword = URLDecoder.decode(resolvedPassword, StandardCharsets.UTF_8);
+                decodedPassword = URLDecoder.decode(resolvedPassword, StandardCharsets.UTF_8);
             } catch (Exception ignored) {
             }
         }
@@ -160,23 +170,48 @@ public class DatabaseConfig {
             }
         }
 
-        log.info("Configuring DataSource -> Host: {}, Port: {}, Database: {}, Username: {}",
-                host, port, database, resolvedUsername);
+        int passLength = (decodedPassword != null) ? decodedPassword.length() : 0;
+        String passSource = passwordFromEnv ? "Render Environment" : "Default Fallback";
 
-        HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl(resolvedUrl);
-        hikariConfig.setUsername(resolvedUsername);
-        hikariConfig.setPassword(resolvedPassword);
-        hikariConfig.setDriverClassName(driverClassName);
-        hikariConfig.setPoolName("MontraHikariPool");
+        log.info("Configuring DataSource -> Host: {}, Port: {}, Database: {}, Username: {}, PasswordSource: {}, PasswordLength: {}",
+                host, port, database, resolvedUsername, passSource, passLength);
+
+        if (!passwordFromEnv && (host.contains("supabase.com") || host.contains("pooler.supabase.com"))) {
+            log.error("CRITICAL: DB_PASSWORD environment variable is NOT reaching the application! " +
+                    "The application is using the fallback password 'password', which Supabase will reject. " +
+                    "Make sure your Environment Group is LINKED to this service under 'montra-backend -> Environment' in Render.");
+        }
+
+        HikariConfig primaryConfig = createHikariConfig(resolvedUrl, resolvedUsername, decodedPassword, driverClassName);
+
+        try {
+            return new HikariDataSource(primaryConfig);
+        } catch (HikariPool.PoolInitializationException e) {
+            // If authentication failed and decoded password differs from raw password, retry with raw password
+            if (rawPassword != null && !rawPassword.equals(decodedPassword)) {
+                log.warn("Datasource initialization with decoded password failed. Retrying with raw password format...");
+                HikariConfig retryConfig = createHikariConfig(resolvedUrl, resolvedUsername, rawPassword, driverClassName);
+                return new HikariDataSource(retryConfig);
+            }
+            throw e;
+        }
+    }
+
+    private HikariConfig createHikariConfig(String jdbcUrl, String user, String pass, String driverClass) {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(jdbcUrl);
+        config.setUsername(user);
+        config.setPassword(pass);
+        config.setDriverClassName(driverClass);
+        config.setPoolName("MontraHikariPool");
 
         // Sensible connection pool configuration
-        hikariConfig.setMaximumPoolSize(10);
-        hikariConfig.setMinimumIdle(2);
-        hikariConfig.setConnectionTimeout(30000);
-        hikariConfig.setIdleTimeout(600000);
-        hikariConfig.setMaxLifetime(1800000);
+        config.setMaximumPoolSize(10);
+        config.setMinimumIdle(2);
+        config.setConnectionTimeout(30000);
+        config.setIdleTimeout(600000);
+        config.setMaxLifetime(1800000);
 
-        return new HikariDataSource(hikariConfig);
+        return config;
     }
 }
