@@ -18,6 +18,8 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,6 +70,11 @@ public class DatabaseConfig {
             }
         }
 
+        // Clean surrounding whitespace and quotes
+        resolvedUrl = cleanValue(resolvedUrl);
+        resolvedUsername = cleanValue(resolvedUsername);
+        resolvedPassword = cleanValue(resolvedPassword);
+
         if (resolvedUrl != null) {
             // Normalize postgres:// or postgresql:// to jdbc:postgresql://
             if (resolvedUrl.startsWith("postgres://")) {
@@ -86,6 +93,7 @@ public class DatabaseConfig {
                 } catch (Exception e) {
                     extractedUser = userMatcher.group(1);
                 }
+                extractedUser = cleanValue(extractedUser);
                 if (resolvedUsername == null || resolvedUsername.isBlank() || "postgres".equals(resolvedUsername)) {
                     resolvedUsername = extractedUser;
                 }
@@ -101,6 +109,7 @@ public class DatabaseConfig {
                 } catch (Exception e) {
                     extractedPass = passMatcher.group(1);
                 }
+                extractedPass = cleanValue(extractedPass);
                 if (!passwordFromEnv && (resolvedPassword == null || resolvedPassword.isBlank() || "password".equals(resolvedPassword))) {
                     resolvedPassword = extractedPass;
                     passwordFromEnv = true;
@@ -119,16 +128,6 @@ public class DatabaseConfig {
                 if (!resolvedUrl.contains("sslmode=")) {
                     resolvedUrl += (resolvedUrl.contains("?") ? "&" : "?") + "sslmode=require";
                 }
-            }
-        }
-
-        // Store raw and decoded password variations
-        String rawPassword = resolvedPassword;
-        String decodedPassword = resolvedPassword;
-        if (resolvedPassword != null && resolvedPassword.contains("%")) {
-            try {
-                decodedPassword = URLDecoder.decode(resolvedPassword, StandardCharsets.UTF_8);
-            } catch (Exception ignored) {
             }
         }
 
@@ -174,11 +173,35 @@ public class DatabaseConfig {
             }
         }
 
-        int passLength = (decodedPassword != null) ? decodedPassword.length() : 0;
-        String passSource = passwordFromEnv ? "Render Environment" : "Default Fallback";
+        // Candidate password variations to try
+        List<String> passwordCandidates = new ArrayList<>();
+        if (resolvedPassword != null && !resolvedPassword.isBlank()) {
+            passwordCandidates.add(resolvedPassword);
 
-        log.info("Configuring DataSource -> Host: {}, Port: {}, Database: {}, Username: {}, PasswordSource: {}, PasswordLength: {}",
-                host, port, database, resolvedUsername, passSource, passLength);
+            if (resolvedPassword.contains("%")) {
+                try {
+                    String decoded = URLDecoder.decode(resolvedPassword, StandardCharsets.UTF_8);
+                    if (!passwordCandidates.contains(decoded)) {
+                        passwordCandidates.add(0, decoded); // prefer decoded if percent signs exist
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+
+            if (resolvedPassword.contains("%40")) {
+                String atReplaced = resolvedPassword.replace("%40", "@");
+                if (!passwordCandidates.contains(atReplaced)) {
+                    passwordCandidates.add(atReplaced);
+                }
+            }
+        }
+
+        int passLength = (resolvedPassword != null) ? resolvedPassword.length() : 0;
+        String passSource = passwordFromEnv ? "Render Environment" : "Default Fallback";
+        String maskedPass = maskPassword(resolvedPassword);
+
+        log.info("Configuring DataSource -> Host: {}, Port: {}, Database: {}, Username: {}, PasswordSource: {}, PasswordLength: {}, MaskedPassword: {}",
+                host, port, database, resolvedUsername, passSource, passLength, maskedPass);
 
         if (!passwordFromEnv && (host.contains("supabase.com") || host.contains("pooler.supabase.com"))) {
             log.error("CRITICAL: DB_PASSWORD environment variable is NOT reaching the application! " +
@@ -186,19 +209,54 @@ public class DatabaseConfig {
                     "Make sure your Environment Group is LINKED to this service under 'montra-backend -> Environment' in Render.");
         }
 
-        HikariConfig primaryConfig = createHikariConfig(resolvedUrl, resolvedUsername, decodedPassword, driverClassName);
-
-        try {
-            return new HikariDataSource(primaryConfig);
-        } catch (HikariPool.PoolInitializationException e) {
-            // If authentication failed and decoded password differs from raw password, retry with raw password
-            if (rawPassword != null && !rawPassword.equals(decodedPassword)) {
-                log.warn("Datasource initialization with decoded password failed. Retrying with raw password format...");
-                HikariConfig retryConfig = createHikariConfig(resolvedUrl, resolvedUsername, rawPassword, driverClassName);
-                return new HikariDataSource(retryConfig);
+        HikariPool.PoolInitializationException lastException = null;
+        for (int i = 0; i < passwordCandidates.size(); i++) {
+            String candidate = passwordCandidates.get(i);
+            try {
+                HikariConfig config = createHikariConfig(resolvedUrl, resolvedUsername, candidate, driverClassName);
+                HikariDataSource ds = new HikariDataSource(config);
+                if (i > 0) {
+                    log.info("Successfully connected to database with password candidate variant #{}", (i + 1));
+                }
+                return ds;
+            } catch (HikariPool.PoolInitializationException e) {
+                lastException = e;
+                if (i < passwordCandidates.size() - 1) {
+                    log.warn("Datasource initialization failed with candidate variant #{}. Trying next variant...", (i + 1));
+                }
             }
-            throw e;
         }
+
+        if (lastException != null) {
+            throw lastException;
+        }
+
+        // Fallback if no candidates
+        HikariConfig fallbackConfig = createHikariConfig(resolvedUrl, resolvedUsername, resolvedPassword, driverClassName);
+        return new HikariDataSource(fallbackConfig);
+    }
+
+    private String cleanValue(String val) {
+        if (val == null) {
+            return null;
+        }
+        val = val.trim();
+        if ((val.startsWith("\"") && val.endsWith("\"")) || (val.startsWith("'") && val.endsWith("'"))) {
+            if (val.length() >= 2) {
+                val = val.substring(1, val.length() - 1).trim();
+            }
+        }
+        return val;
+    }
+
+    private String maskPassword(String pass) {
+        if (pass == null || pass.isEmpty()) {
+            return "EMPTY";
+        }
+        if (pass.length() <= 4) {
+            return "*".repeat(pass.length());
+        }
+        return pass.substring(0, 2) + "***" + pass.substring(pass.length() - 2);
     }
 
     private HikariConfig createHikariConfig(String jdbcUrl, String user, String pass, String driverClass) {
