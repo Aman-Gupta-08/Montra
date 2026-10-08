@@ -21,6 +21,8 @@ public class DatabaseConfig {
 
     private static final Logger log = LoggerFactory.getLogger(DatabaseConfig.class);
 
+    private static final String DEFAULT_SUPABASE_PROJECT_REF = "zmfyysjojvshleibvgjs";
+
     @Value("${spring.datasource.url}")
     private String url;
 
@@ -36,11 +38,33 @@ public class DatabaseConfig {
     @Bean
     @Primary
     public DataSource dataSource() {
-        String resolvedUrl = url;
-        String resolvedUsername = username;
-        String resolvedPassword = password;
+        // Priority 1: Check environment variables directly, then fallback to Spring @Value properties
+        String resolvedUrl = System.getenv("DB_URL");
+        if (resolvedUrl == null || resolvedUrl.isBlank()) {
+            String dbUrlAlt = System.getenv("DATABASE_URL");
+            resolvedUrl = (dbUrlAlt != null && !dbUrlAlt.isBlank()) ? dbUrlAlt : this.url;
+        }
+
+        String resolvedUsername = System.getenv("DB_USERNAME");
+        if (resolvedUsername == null || resolvedUsername.isBlank()) {
+            String dbUserAlt = System.getenv("DATABASE_USERNAME");
+            resolvedUsername = (dbUserAlt != null && !dbUserAlt.isBlank()) ? dbUserAlt : this.username;
+        }
+
+        String resolvedPassword = System.getenv("DB_PASSWORD");
+        if (resolvedPassword == null || resolvedPassword.isBlank()) {
+            String dbPassAlt = System.getenv("DATABASE_PASSWORD");
+            resolvedPassword = (dbPassAlt != null && !dbPassAlt.isBlank()) ? dbPassAlt : this.password;
+        }
 
         if (resolvedUrl != null) {
+            // Normalize postgres:// or postgresql:// to jdbc:postgresql://
+            if (resolvedUrl.startsWith("postgres://")) {
+                resolvedUrl = "jdbc:postgresql://" + resolvedUrl.substring("postgres://".length());
+            } else if (resolvedUrl.startsWith("postgresql://")) {
+                resolvedUrl = "jdbc:postgresql://" + resolvedUrl.substring("postgresql://".length());
+            }
+
             // Extract user from JDBC URL if username is empty or default 'postgres'
             Pattern userPattern = Pattern.compile("[?&]user=([^&]+)");
             Matcher userMatcher = userPattern.matcher(resolvedUrl);
@@ -119,14 +143,25 @@ public class DatabaseConfig {
         } catch (Exception ignored) {
         }
 
+        // Supabase Session Pooler check:
+        // Supabase Session Pooler requires the tenant-scoped username (postgres.<project-ref>).
+        // If username is bare 'postgres' or empty on pooler.supabase.com, auto-resolve to postgres.<project-ref>
+        if (host.contains("pooler.supabase.com")) {
+            if (resolvedUsername == null || resolvedUsername.isBlank() || "postgres".equalsIgnoreCase(resolvedUsername)) {
+                String projectRef = System.getenv("SUPABASE_PROJECT_REF");
+                if (projectRef == null || projectRef.isBlank()) {
+                    projectRef = System.getenv("SUPABASE_PROJECT_ID");
+                }
+                if (projectRef == null || projectRef.isBlank()) {
+                    projectRef = DEFAULT_SUPABASE_PROJECT_REF;
+                }
+                resolvedUsername = "postgres." + projectRef;
+                log.info("Auto-resolved Supabase Session Pooler tenant username to: {}", resolvedUsername);
+            }
+        }
+
         log.info("Configuring DataSource -> Host: {}, Port: {}, Database: {}, Username: {}",
                 host, port, database, resolvedUsername);
-
-        if (host.contains("pooler.supabase.com") && "postgres".equalsIgnoreCase(resolvedUsername)) {
-            log.warn("WARNING: Connecting to Supabase Session Pooler with username 'postgres'. " +
-                    "Supabase Session Pooler requires the tenant username format (e.g., 'postgres.<project-ref>'). " +
-                    "Ensure DB_USERNAME is set to your exact Supabase Session Pooler username in Render environment variables.");
-        }
 
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(resolvedUrl);
