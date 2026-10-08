@@ -6,6 +6,7 @@ import com.zaxxer.hikari.pool.HikariPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -14,6 +15,9 @@ import javax.sql.DataSource;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -213,5 +217,42 @@ public class DatabaseConfig {
         config.setMaxLifetime(1800000);
 
         return config;
+    }
+
+    @Bean
+    public FlywayMigrationStrategy flywayMigrationStrategy() {
+        return flyway -> {
+            try {
+                DataSource ds = flyway.getConfiguration().getDataSource();
+                try (Connection conn = ds.getConnection();
+                     Statement stmt = conn.createStatement()) {
+                    // Check if 'users' table exists. If not, V1__init.sql has never successfully run.
+                    // If flyway_schema_history exists with an invalid baseline or failed V2 state, reset it so V1 executes.
+                    ResultSet rs = stmt.executeQuery(
+                            "SELECT EXISTS (" +
+                            "    SELECT 1 FROM information_schema.tables " +
+                            "    WHERE table_schema = 'public' AND table_name = 'users'" +
+                            ")"
+                    );
+                    if (rs.next() && !rs.getBoolean(1)) {
+                        log.info("Notice: 'users' table does not exist in 'public' schema. " +
+                                "Clearing corrupted flyway_schema_history to ensure V1__init.sql runs cleanly...");
+                        stmt.execute("DROP TABLE IF EXISTS flyway_schema_history CASCADE");
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Notice: could not inspect 'users' table: {}", e.getMessage());
+            }
+
+            try {
+                flyway.repair();
+            } catch (Exception e) {
+                log.warn("Flyway repair notice: {}", e.getMessage());
+            }
+
+            log.info("Executing Flyway migrations...");
+            flyway.migrate();
+            log.info("Flyway migrations completed successfully.");
+        };
     }
 }
