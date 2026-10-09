@@ -19,6 +19,14 @@ class HealthControllerTest {
     private MockMvc mockMvc;
 
     @Test
+    void rootEndpoint_ReturnsOkWithoutAuthentication() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"))
+                .andExpect(jsonPath("$.service").value("Montra Backend"));
+    }
+
+    @Test
     void healthEndpoint_ReturnsOkWithoutAuthentication() throws Exception {
         mockMvc.perform(get("/health"))
                 .andExpect(status().isOk())
