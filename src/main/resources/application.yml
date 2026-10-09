@@ -27,3 +27,13 @@ storage:
   url: ${FILE_STORAGE_URL:uploads/}
   key: ${FILE_STORAGE_KEY:}
   secret: ${FILE_STORAGE_SECRET:}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: never

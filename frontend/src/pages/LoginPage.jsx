@@ -86,8 +86,8 @@ export default function LoginPage() {
       const msg = result.message || '';
       if (msg.toLowerCase().includes('credential') || msg.toLowerCase().includes('password') || msg.toLowerCase().includes('user')) {
         setApiError('Invalid credentials. Use Quick Demo Login.');
-      } else if (msg.toLowerCase().includes('network') || msg.toLowerCase().includes('connect')) {
-        setApiError('Backend offline. Use Quick Demo Login below.');
+      } else if (msg.toLowerCase().includes('network') || msg.toLowerCase().includes('connect') || msg.toLowerCase().includes('timeout')) {
+        setApiError('Backend unreachable or waking up. Please retry shortly, or use Quick Demo Login.');
       } else {
         setApiError(msg || 'Authentication failed. Use Quick Demo Login.');
       }

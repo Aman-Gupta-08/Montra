@@ -2,7 +2,14 @@ import axios from 'axios';
 import { handleMockRequest } from './mockDataStore';
 
 const getBaseURL = () => {
-  if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
+  const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+  if (envUrl && typeof envUrl === 'string' && envUrl.trim() !== '') {
+    let clean = envUrl.trim().replace(/\/+$/, '');
+    if (!clean.endsWith('/api')) {
+      clean += '/api';
+    }
+    return clean;
+  }
   if (
     typeof window !== 'undefined' &&
     (window.Capacitor?.isNativePlatform?.() ||
@@ -19,7 +26,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 4500, // 4.5s timeout for mobile network latency
+  timeout: 15000, // 15s timeout for mobile network latency and cloud service wake-up
 });
 
 // Request interceptor – attach JWT from localStorage or sessionStorage
@@ -111,5 +118,14 @@ api.interceptors.response.use(
     return Promise.reject(enriched);
   }
 );
+
+export const checkBackendHealth = async () => {
+  try {
+    const response = await api.get('/health');
+    return { ok: true, data: response.data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+};
 
 export default api;

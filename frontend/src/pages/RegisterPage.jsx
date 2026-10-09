@@ -205,8 +205,8 @@ export default function RegisterPage() {
         msg.toLowerCase().includes('already')
       ) {
         setApiError('An account with this email already exists.');
-      } else if (msg.toLowerCase().includes('network') || msg.toLowerCase().includes('connect')) {
-        setApiError('Backend offline. Use Quick Demo Login below.');
+      } else if (msg.toLowerCase().includes('network') || msg.toLowerCase().includes('connect') || msg.toLowerCase().includes('timeout')) {
+        setApiError('Backend unreachable or waking up. Please retry shortly, or use Quick Demo Login.');
       } else {
         setApiError(msg || 'Registration failed. Use Quick Demo Login.');
       }
