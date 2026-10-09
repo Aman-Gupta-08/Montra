@@ -76,7 +76,11 @@ export default function LoginPage() {
     setSubmitStatus(null);
     setApiError('');
 
-    const result = await login(form.emailOrPhone, form.password);
+    const result = await login({
+      emailOrPhone: form.emailOrPhone,
+      password: form.password,
+      rememberMe: form.rememberMe,
+    });
 
     if (result.success) {
       setSubmitStatus('success');

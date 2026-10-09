@@ -32,12 +32,26 @@ export function AuthProvider({ children }) {
 
   const isAuthenticated = !!token && !!user;
 
-  const login = useCallback(async ({ emailOrPhone, password, rememberMe }) => {
+  const login = useCallback(async (credentialsOrEmail, optionalPassword, optionalRememberMe) => {
     setIsLoading(true);
     try {
+      let emailVal = '';
+      let passwordVal = '';
+      let rememberMeVal = true;
+
+      if (typeof credentialsOrEmail === 'object' && credentialsOrEmail !== null) {
+        emailVal = credentialsOrEmail.email || credentialsOrEmail.emailOrPhone || '';
+        passwordVal = credentialsOrEmail.password || '';
+        rememberMeVal = credentialsOrEmail.rememberMe ?? true;
+      } else {
+        emailVal = credentialsOrEmail || '';
+        passwordVal = optionalPassword || '';
+        rememberMeVal = optionalRememberMe ?? true;
+      }
+
       const response = await api.post('/auth/login', {
-        email: emailOrPhone,
-        password,
+        email: String(emailVal || '').trim(),
+        password: String(passwordVal || ''),
       });
       const { token: newToken, user: userData } = response.data;
       const normalizedUser = normalizeUser(userData);
@@ -55,16 +69,28 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const register = useCallback(async ({ name, email, phone, password, accountType }) => {
+  const register = useCallback(async (dataOrName, optionalEmail, optionalPhone, optionalPassword, optionalAccountType) => {
     setIsLoading(true);
     try {
-      const response = await api.post('/auth/register', {
-        name,
-        email,
-        phone,
-        password,
-        userType: accountType,
-      });
+      let payload = {};
+      if (typeof dataOrName === 'object' && dataOrName !== null) {
+        payload = {
+          name: String(dataOrName.name || '').trim(),
+          email: String(dataOrName.email || '').trim(),
+          phone: String(dataOrName.phone || '').trim(),
+          password: String(dataOrName.password || ''),
+          userType: dataOrName.userType || dataOrName.accountType || 'STUDENT',
+        };
+      } else {
+        payload = {
+          name: String(dataOrName || '').trim(),
+          email: String(optionalEmail || '').trim(),
+          phone: String(optionalPhone || '').trim(),
+          password: String(optionalPassword || ''),
+          userType: optionalAccountType || 'STUDENT',
+        };
+      }
+      const response = await api.post('/auth/register', payload);
       const { token: newToken, user: userData } = response.data;
       const normalizedUser = normalizeUser(userData);
       setToken(newToken);
