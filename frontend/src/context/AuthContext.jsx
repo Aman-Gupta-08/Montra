@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import api from '../api/axios';
+import { authService } from '../services/authService';
 
 const AuthContext = createContext(undefined);
 
@@ -49,11 +50,11 @@ export function AuthProvider({ children }) {
         rememberMeVal = optionalRememberMe ?? true;
       }
 
-      const response = await api.post('/auth/login', {
-        email: String(emailVal || '').trim(),
-        password: String(passwordVal || ''),
+      const data = await authService.login({
+        email: emailVal,
+        password: passwordVal,
       });
-      const { token: newToken, user: userData } = response.data;
+      const { token: newToken, user: userData } = data;
       const normalizedUser = normalizeUser(userData);
       setToken(newToken);
       setUser(normalizedUser);
@@ -90,8 +91,8 @@ export function AuthProvider({ children }) {
           userType: optionalAccountType || 'STUDENT',
         };
       }
-      const response = await api.post('/auth/register', payload);
-      const { token: newToken, user: userData } = response.data;
+      const data = await authService.register(payload);
+      const { token: newToken, user: userData } = data;
       const normalizedUser = normalizeUser(userData);
       setToken(newToken);
       setUser(normalizedUser);

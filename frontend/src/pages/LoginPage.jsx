@@ -77,6 +77,7 @@ export default function LoginPage() {
     setApiError('');
 
     const result = await login({
+      email: form.emailOrPhone,
       emailOrPhone: form.emailOrPhone,
       password: form.password,
       rememberMe: form.rememberMe,
@@ -307,6 +308,7 @@ export default function LoginPage() {
                       <Mail size={17} />
                     </div>
                     <input
+                      id="login-email-input"
                       type="text"
                       name="emailOrPhone"
                       value={form.emailOrPhone}
@@ -347,6 +349,7 @@ export default function LoginPage() {
                       <Lock size={17} />
                     </div>
                     <input
+                      id="login-password-input"
                       type={showPassword ? 'text' : 'password'}
                       name="password"
                       value={form.password}

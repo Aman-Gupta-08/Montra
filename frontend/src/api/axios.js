@@ -1,8 +1,13 @@
 import axios from 'axios';
-import { handleMockRequest } from './mockDataStore';
+import { handleMockRequest } from './mockDataStore.js';
 
 const getBaseURL = () => {
-  const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+  const envUrl =
+    (typeof import.meta !== 'undefined' && import.meta?.env
+      ? import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL
+      : typeof process !== 'undefined' && process?.env
+      ? process.env.VITE_API_URL || process.env.VITE_API_BASE_URL
+      : null);
   if (envUrl && typeof envUrl === 'string' && envUrl.trim() !== '') {
     let clean = envUrl.trim().replace(/\/+$/, '');
     if (!clean.endsWith('/api')) {
@@ -35,6 +40,13 @@ api.interceptors.request.use(
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    // Ensure application/json header is set for non-FormData payloads
+    if (config.data && typeof config.data === 'object' && !(typeof FormData !== 'undefined' && config.data instanceof FormData)) {
+      if (!config.headers['Content-Type']) {
+        config.headers['Content-Type'] = 'application/json';
+      }
     }
 
     // If active session is Demo Mode and not auth login/register, serve mock immediately
