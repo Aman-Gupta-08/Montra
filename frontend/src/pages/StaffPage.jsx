@@ -445,17 +445,18 @@ export default function StaffPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           <Link
             to="/salary"
-            className="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm font-medium text-primary-text dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-2"
+            className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs sm:text-sm font-medium text-primary-text dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-1.5 sm:gap-2 flex-1 sm:flex-initial justify-center"
           >
-            <DollarSign size={16} className="text-emerald-500" />
+            <DollarSign size={15} className="text-emerald-500" />
             <span>Salary Payouts</span>
           </Link>
           <Button
             action="signup"
             size="md"
+            className="flex-1 sm:flex-initial"
             onClick={() => {
               setSelectedStaff(null);
               setPanelMode('ADD');
@@ -467,44 +468,44 @@ export default function StaffPage() {
       </div>
 
       {/* KPI Metric Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded-2xl glass-card flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400 flex items-center justify-center flex-shrink-0 border border-violet-500/20">
-            <Users size={20} />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl glass-card flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400 flex items-center justify-center flex-shrink-0 border border-violet-500/20">
+            <Users className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div>
-            <span className="text-xs font-medium text-secondary-text block mb-0.5">Total Staff</span>
-            <span className="text-xl font-bold text-primary-text dark:text-white">{metrics.totalCount}</span>
-          </div>
-        </div>
-
-        <div className="p-4 rounded-2xl glass-card flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 border border-emerald-500/20">
-            <UserCheck size={20} />
-          </div>
-          <div>
-            <span className="text-xs font-medium text-secondary-text block mb-0.5">Active Staff</span>
-            <span className="text-xl font-bold text-emerald-600 dark:text-emerald-400">{metrics.activeCount}</span>
+          <div className="min-w-0 flex-1">
+            <span className="text-[10px] sm:text-xs font-medium text-secondary-text block mb-0.5 truncate">Total Staff</span>
+            <span className="text-base sm:text-xl font-bold text-primary-text dark:text-white truncate block">{metrics.totalCount}</span>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl glass-card flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0 border border-amber-500/20">
-            <Clock size={20} />
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl glass-card flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 border border-emerald-500/20">
+            <UserCheck className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div>
-            <span className="text-xs font-medium text-secondary-text block mb-0.5">On Leave</span>
-            <span className="text-xl font-bold text-amber-600 dark:text-amber-400">{metrics.onLeaveCount}</span>
+          <div className="min-w-0 flex-1">
+            <span className="text-[10px] sm:text-xs font-medium text-secondary-text block mb-0.5 truncate">Active Staff</span>
+            <span className="text-base sm:text-xl font-bold text-emerald-600 dark:text-emerald-400 truncate block">{metrics.activeCount}</span>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl glass-card flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center flex-shrink-0 border border-indigo-500/20">
-            <DollarSign size={20} />
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl glass-card flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0 border border-amber-500/20">
+            <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div>
-            <span className="text-xs font-medium text-secondary-text block mb-0.5">Monthly Payroll</span>
-            <span className="text-xl font-bold text-primary-text dark:text-white">{fmt(metrics.monthlyLiability)}</span>
+          <div className="min-w-0 flex-1">
+            <span className="text-[10px] sm:text-xs font-medium text-secondary-text block mb-0.5 truncate">On Leave</span>
+            <span className="text-base sm:text-xl font-bold text-amber-600 dark:text-amber-400 truncate block">{metrics.onLeaveCount}</span>
+          </div>
+        </div>
+
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl glass-card flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center flex-shrink-0 border border-indigo-500/20">
+            <DollarSign className="w-4 h-4 sm:w-5 sm:h-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <span className="text-[10px] sm:text-xs font-medium text-secondary-text block mb-0.5 truncate">Monthly Payroll</span>
+            <span className="text-sm sm:text-xl font-bold text-primary-text dark:text-white truncate block">{fmt(metrics.monthlyLiability)}</span>
           </div>
         </div>
       </div>

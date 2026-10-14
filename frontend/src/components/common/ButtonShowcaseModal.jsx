@@ -45,20 +45,20 @@ export function ButtonShowcaseModal({ isOpen, onClose }) {
           className="relative w-full max-w-5xl bg-white dark:bg-[#121316] rounded-3xl border border-gray-200 dark:border-white/10 shadow-2xl overflow-hidden z-10 my-8 flex flex-col max-h-[90vh]"
         >
           {/* Header */}
-          <div className="px-6 py-5 border-b border-gray-100 dark:border-white/10 flex items-center justify-between bg-gray-50/50 dark:bg-white/[0.02]">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-violet-500/20">
-                <Sparkles size={20} />
+          <div className="px-4 sm:px-6 py-3.5 sm:py-5 border-b border-gray-100 dark:border-white/10 flex items-center justify-between bg-gray-50/50 dark:bg-white/[0.02]">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-violet-500/20 flex-shrink-0">
+                <Sparkles size={18} />
               </div>
-              <div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  Montra Animated Button Design System
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 font-semibold">
+              <div className="min-w-0">
+                <h3 className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-1.5 sm:gap-2 truncate">
+                  <span className="truncate">Button Design System</span>
+                  <span className="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 font-semibold flex-shrink-0">
                     19 Actions
                   </span>
                 </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Primary HTML+CSS motion reference engine with action-specific micro-interactions
+                <p className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 truncate">
+                  Micro-interactions and motion states
                 </p>
               </div>
             </div>
@@ -66,23 +66,23 @@ export function ButtonShowcaseModal({ isOpen, onClose }) {
             <button
               onClick={onClose}
               id="close-showcase-btn"
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all flex-shrink-0"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
           </div>
 
           {/* Controls Bar */}
-          <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-white/10 bg-gray-50/80 dark:bg-black/20 flex flex-wrap items-center justify-between gap-4">
+          <div className="p-3 sm:p-5 border-b border-gray-100 dark:border-white/10 bg-gray-50/80 dark:bg-black/20 flex flex-wrap items-center justify-between gap-2.5 sm:gap-4">
             {/* Global State Switcher */}
-            <div className="flex items-center gap-1 bg-white dark:bg-white/5 p-1 rounded-xl border border-gray-200/80 dark:border-white/10">
-              <span className="text-xs font-semibold px-2.5 text-gray-500">State:</span>
+            <div className="flex items-center gap-1 bg-white dark:bg-white/5 p-1 rounded-xl border border-gray-200/80 dark:border-white/10 overflow-x-auto max-w-full">
+              <span className="text-xs font-semibold px-2 text-gray-500 hidden sm:inline">State:</span>
               {['default', 'loading', 'success', 'error', 'disabled'].map((st) => (
                 <button
                   key={st}
                   id={`btn-state-toggle-${st}`}
                   onClick={() => setGlobalState(st)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${
+                  className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold capitalize transition-all ${
                     globalState === st
                       ? 'bg-violet-600 text-white shadow-xs'
                       : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
@@ -94,14 +94,14 @@ export function ButtonShowcaseModal({ isOpen, onClose }) {
             </div>
 
             {/* Variant Switcher */}
-            <div className="flex items-center gap-1 bg-white dark:bg-white/5 p-1 rounded-xl border border-gray-200/80 dark:border-white/10">
-              <span className="text-xs font-semibold px-2.5 text-gray-500">Variant:</span>
+            <div className="flex items-center gap-1 bg-white dark:bg-white/5 p-1 rounded-xl border border-gray-200/80 dark:border-white/10 overflow-x-auto max-w-full">
+              <span className="text-xs font-semibold px-2 text-gray-500 hidden sm:inline">Variant:</span>
               {['primary', 'secondary', 'outline', 'ghost', 'danger', 'success', 'liquid'].map((v) => (
                 <button
                   key={v}
                   id={`btn-variant-toggle-${v}`}
                   onClick={() => setSelectedVariant(v)}
-                  className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${
+                  className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold capitalize transition-all ${
                     selectedVariant === v
                       ? 'bg-violet-600 text-white shadow-xs'
                       : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
@@ -114,13 +114,13 @@ export function ButtonShowcaseModal({ isOpen, onClose }) {
 
             {/* Size Switcher */}
             <div className="flex items-center gap-1 bg-white dark:bg-white/5 p-1 rounded-xl border border-gray-200/80 dark:border-white/10">
-              <span className="text-xs font-semibold px-2.5 text-gray-500">Size:</span>
+              <span className="text-xs font-semibold px-2 text-gray-500 hidden sm:inline">Size:</span>
               {['sm', 'md', 'lg'].map((sz) => (
                 <button
                   key={sz}
                   id={`btn-size-toggle-${sz}`}
                   onClick={() => setSelectedSize(sz)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase transition-all ${
+                  className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold uppercase transition-all ${
                     selectedSize === sz
                       ? 'bg-violet-600 text-white shadow-xs'
                       : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
@@ -133,7 +133,7 @@ export function ButtonShowcaseModal({ isOpen, onClose }) {
           </div>
 
           {/* Grid of All 19 Action Buttons */}
-          <div className="p-6 overflow-y-auto flex-1 bg-gray-50/40 dark:bg-black/30">
+          <div className="p-3.5 sm:p-6 overflow-y-auto flex-1 bg-gray-50/40 dark:bg-black/30">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {actionKeys.map((actionKey) => {
                 const config = BUTTON_ACTIONS[actionKey];

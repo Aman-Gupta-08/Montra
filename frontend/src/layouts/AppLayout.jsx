@@ -38,10 +38,10 @@ export function AppLayout({ children }) {
 
   return (
     <KineticGrid
-      className="h-screen w-screen overflow-hidden"
+      className="h-screen h-[100dvh] w-full overflow-hidden"
       globalColor={isDark ? "default" : "light"}
     >
-      <div className="flex h-screen overflow-hidden bg-transparent relative">
+      <div className="flex h-screen h-[100dvh] w-full overflow-hidden bg-transparent relative">
         {/* Sidebar */}
         <Sidebar
           collapsed={sidebarCollapsed}

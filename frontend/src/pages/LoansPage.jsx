@@ -41,7 +41,7 @@ function SummaryCards({ loans }) {
   const overdueCount = useMemo(() => loans.filter((l) => l.status === 'OVERDUE').length, [loans]);
 
   return (
-    <div className="grid grid-cols-3 gap-2 sm:gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4">
       {[
         { label: 'Total Lent', value: fmt(totalLent), color: '#10B981', bg: '#E6F7E4', icon: TrendingUp },
         { label: 'Total Borrowed', value: fmt(totalBorrowed), color: '#7C5CFC', bg: '#EDEBF7', icon: TrendingDown },
@@ -52,7 +52,9 @@ function SummaryCards({ loans }) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.05 }}
-          className="bg-white/70 dark:bg-black/40 backdrop-blur-xl rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-gray-200/60 dark:border-white/10 shadow-sm flex flex-col sm:flex-row items-start gap-2 sm:gap-3 min-w-0"
+          className={`bg-white/70 dark:bg-black/40 backdrop-blur-xl rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-gray-200/60 dark:border-white/10 shadow-sm flex flex-col sm:flex-row items-start gap-2 sm:gap-3 min-w-0 ${
+            i === 2 ? 'col-span-2 sm:col-span-1' : ''
+          }`}
         >
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: c.bg }}>
             <c.icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: c.color }} />

@@ -299,7 +299,7 @@ export default function ReportsPage() {
       </AnimatePresence>
 
       {/* ─── Financial KPIs Summary Cards ─── */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
         {[
           {
             label: 'Total Income',
@@ -342,7 +342,9 @@ export default function ReportsPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.04 }}
-            className="bg-white/70 dark:bg-black/40 backdrop-blur-xl rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-gray-200/60 dark:border-white/10 shadow-sm flex flex-col sm:flex-row items-start gap-2 sm:gap-3 min-w-0"
+            className={`bg-white/70 dark:bg-black/40 backdrop-blur-xl rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-gray-200/60 dark:border-white/10 shadow-sm flex flex-col sm:flex-row items-start gap-2 sm:gap-3 min-w-0 ${
+              idx === 4 ? 'col-span-2 sm:col-span-1' : ''
+            }`}
           >
             <div
               className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0"

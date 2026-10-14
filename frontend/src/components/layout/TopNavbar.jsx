@@ -131,15 +131,24 @@ export function TopNavbar({ pageTitle, onMenuToggle, sidebarCollapsed, onSidebar
     return () => window.removeEventListener('montra:notifications-changed', handleNotifUpdate);
   }, [refetchUnread]);
 
-  // Close notification panel on outside click
+  // Close notification panel on outside click or Escape
   useEffect(() => {
     const handleClick = (e) => {
       if (notifRef.current && !notifRef.current.contains(e.target)) {
         setNotifOpen(false);
       }
     };
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setNotifOpen(false);
+      }
+    };
     document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   const effectiveAccountType = user?.accountType || user?.userType;
@@ -148,7 +157,7 @@ export function TopNavbar({ pageTitle, onMenuToggle, sidebarCollapsed, onSidebar
   return (
     <header className="min-h-16 pt-[max(env(safe-area-inset-top),0px)] glass-2 border-b border-white/70 dark:border-white/10 flex items-center justify-between px-3 sm:px-4 md:px-6 flex-shrink-0 sticky top-0 z-30 transition-all">
       {/* Left: hamburger + logo + sidebar toggle + page title */}
-      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+      <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-3 min-w-0 flex-1 mr-2">
         {/* Mobile hamburger */}
         <button
           id="mobile-menu-toggle"
@@ -174,7 +183,7 @@ export function TopNavbar({ pageTitle, onMenuToggle, sidebarCollapsed, onSidebar
           {sidebarCollapsed ? <PanelLeft size={18} /> : <PanelLeftClose size={18} />}
         </button>
 
-        <h1 className="text-sm sm:text-base md:text-lg font-bold text-gray-900 dark:text-white tracking-tight truncate max-w-[110px] xs:max-w-[170px] sm:max-w-none">
+        <h1 className="text-sm sm:text-base md:text-lg font-bold text-gray-900 dark:text-white tracking-tight truncate min-w-0">
           {pageTitle}
         </h1>
       </div>
@@ -248,8 +257,17 @@ function UserMenuDropdown({ user, avatarColor }) {
         setOpen(false);
       }
     }
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') {
+        setOpen(false);
+      }
+    }
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   return (

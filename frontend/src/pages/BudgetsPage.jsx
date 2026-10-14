@@ -312,31 +312,35 @@ export default function BudgetsPage() {
           />
         </div>
 
-        <Button
-          id="budget-filter-btn"
-          action="filter"
-          variant={showFilters || filterPeriod !== 'ALL' || filterStatus !== 'ALL' ? 'secondary' : undefined}
-          size="md"
-          onClick={() => setShowFilters(!showFilters)}
-          rightIcon={
-            (filterPeriod !== 'ALL' || filterStatus !== 'ALL') ? (
-              <span className="w-2 h-2 rounded-full bg-violet-600" />
-            ) : (
-              <ChevronDown size={14} className={`transition-transform duration-200 ${showFilters ? 'rotate-180' : ''}`} />
-            )
-          }
-        >
-          Filters
-        </Button>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Button
+            id="budget-filter-btn"
+            action="filter"
+            variant={showFilters || filterPeriod !== 'ALL' || filterStatus !== 'ALL' ? 'secondary' : undefined}
+            size="md"
+            className="flex-1 sm:flex-initial"
+            onClick={() => setShowFilters(!showFilters)}
+            rightIcon={
+              (filterPeriod !== 'ALL' || filterStatus !== 'ALL') ? (
+                <span className="w-2 h-2 rounded-full bg-violet-600" />
+              ) : (
+                <ChevronDown size={14} className={`transition-transform duration-200 ${showFilters ? 'rotate-180' : ''}`} />
+              )
+            }
+          >
+            Filters
+          </Button>
 
-        <Button
-          id="add-budget-btn"
-          action="save"
-          size="md"
-          onClick={() => { setEditingBudget(null); setFormOpen(true); }}
-        >
-          Create Budget
-        </Button>
+          <Button
+            id="add-budget-btn"
+            action="save"
+            size="md"
+            className="flex-1 sm:flex-initial"
+            onClick={() => { setEditingBudget(null); setFormOpen(true); }}
+          >
+            Create Budget
+          </Button>
+        </div>
       </div>
 
       {/* Filter Options Drawer */}

@@ -50,17 +50,19 @@ function SummaryCards({ items }) {
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-2 sm:gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4">
       {cards.map((c, i) => (
         <motion.div
           key={c.label}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.05 }}
-          className="bg-white/70 dark:bg-black/40 backdrop-blur-xl rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-gray-200/60 dark:border-white/10 shadow-lg hover:border-emerald-500/30 transition-all min-w-0"
+          className={`bg-white/70 dark:bg-black/40 backdrop-blur-xl rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-gray-200/60 dark:border-white/10 shadow-lg hover:border-emerald-500/30 transition-all min-w-0 ${
+            i === 2 ? 'col-span-2 sm:col-span-1' : ''
+          }`}
         >
-          <p className="text-[10px] sm:text-xs font-medium text-secondary-text mb-0.5 sm:mb-1 truncate">{c.label}</p>
-          <p className="text-sm sm:text-xl font-bold truncate" style={{ color: c.color }}>{c.currency === false ? c.value : c.value}</p>
+          <p className="text-[11px] sm:text-xs font-medium text-secondary-text mb-0.5 sm:mb-1 truncate">{c.label}</p>
+          <p className="text-sm xs:text-base sm:text-xl font-bold truncate" style={{ color: c.color }}>{c.value}</p>
         </motion.div>
       ))}
     </div>
@@ -252,35 +254,39 @@ export default function IncomePage() {
           />
         </div>
 
-        {/* Filter toggle */}
-        <AnimatedButton
-          id="income-filter-btn"
-          action="filter"
-          variant={activeFilters > 0 ? 'secondary' : 'outline'}
-          size="md"
-          onClick={() => setShowFilters((v) => !v)}
-          rightIcon={
-            activeFilters > 0 ? (
-              <span className="w-4 h-4 rounded-full bg-violet-500 text-white text-[10px] font-bold flex items-center justify-center">
-                {activeFilters}
-              </span>
-            ) : (
-              <ChevronDown size={14} className={`transition-transform duration-200 ${showFilters ? 'rotate-180' : ''}`} />
-            )
-          }
-        >
-          Filters
-        </AnimatedButton>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Filter toggle */}
+          <AnimatedButton
+            id="income-filter-btn"
+            action="filter"
+            variant={activeFilters > 0 ? 'secondary' : 'outline'}
+            size="md"
+            className="flex-1 sm:flex-initial"
+            onClick={() => setShowFilters((v) => !v)}
+            rightIcon={
+              activeFilters > 0 ? (
+                <span className="w-4 h-4 rounded-full bg-violet-500 text-white text-[10px] font-bold flex items-center justify-center">
+                  {activeFilters}
+                </span>
+              ) : (
+                <ChevronDown size={14} className={`transition-transform duration-200 ${showFilters ? 'rotate-180' : ''}`} />
+              )
+            }
+          >
+            Filters
+          </AnimatedButton>
 
-        {/* Add button */}
-        <AnimatedButton
-          id="add-income-btn"
-          action="addIncome"
-          size="md"
-          onClick={openAdd}
-        >
-          Add Income
-        </AnimatedButton>
+          {/* Add button */}
+          <AnimatedButton
+            id="add-income-btn"
+            action="addIncome"
+            size="md"
+            className="flex-1 sm:flex-initial"
+            onClick={openAdd}
+          >
+            Add Income
+          </AnimatedButton>
+        </div>
       </div>
 
       {/* Filter panel */}

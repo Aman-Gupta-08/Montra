@@ -407,18 +407,19 @@ export default function SalaryPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           <Link
             to="/staff"
-            className="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm font-medium text-primary-text dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-2"
+            className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs sm:text-sm font-medium text-primary-text dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-1.5 sm:gap-2 flex-1 sm:flex-initial justify-center"
           >
-            <User size={16} className="text-violet-500" />
+            <User size={15} className="text-violet-500" />
             <span>Staff Directory</span>
           </Link>
 
           <Button
             action="generate"
             size="md"
+            className="flex-1 sm:flex-initial"
             onClick={() => setGenerateOpen(true)}
           >
             Generate Salary Slip

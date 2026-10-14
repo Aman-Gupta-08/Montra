@@ -499,15 +499,15 @@ export default function RegisterPage() {
                           type="button"
                           id={`account-type-btn-${type.value.toLowerCase()}`}
                           onClick={() => selectAccountType(type.value)}
-                          className={`p-3 rounded-2xl border text-center transition-all duration-200 flex flex-col items-center gap-1 relative cursor-pointer ${
+                          className={`p-2 xs:p-3 rounded-xl xs:rounded-2xl border text-center transition-all duration-200 flex flex-col items-center gap-0.5 xs:gap-1 relative cursor-pointer ${
                             isSelected
                               ? 'glass-4 border-violet-500/70 text-violet-900 dark:text-white shadow-md shadow-violet-500/15 ring-1 ring-violet-500/40'
                               : 'glass-1 border-white/60 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:border-violet-500/30 hover:bg-white/60 dark:hover:bg-white/10'
                           }`}
                         >
-                          <Icon size={17} className={`transition-transform ${isSelected ? 'text-violet-600 dark:text-violet-400 scale-110 drop-shadow-xs' : 'text-gray-400 dark:text-gray-500'}`} />
-                          <span className="text-[11px] font-bold tracking-tight">{type.label}</span>
-                          <span className={`text-[9px] line-clamp-1 ${isSelected ? 'text-violet-600/80 dark:text-violet-300/80 font-medium' : 'text-gray-400 dark:text-gray-500'}`}>{type.desc}</span>
+                          <Icon size={16} className={`transition-transform ${isSelected ? 'text-violet-600 dark:text-violet-400 scale-110 drop-shadow-xs' : 'text-gray-400 dark:text-gray-500'}`} />
+                          <span className="text-[10px] xs:text-[11px] font-bold tracking-tight">{type.label}</span>
+                          <span className={`text-[8px] xs:text-[9px] line-clamp-1 ${isSelected ? 'text-violet-600/80 dark:text-violet-300/80 font-medium' : 'text-gray-400 dark:text-gray-500'}`}>{type.desc}</span>
                         </button>
                       );
                     })}

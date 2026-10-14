@@ -260,8 +260,8 @@ export default function CalendarPage() {
       {/* ─── Top Control Bar ─── */}
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 bg-white dark:bg-gray-900 rounded-2xl p-4 border border-gray-100 dark:border-gray-800 shadow-sm">
         {/* Navigation & Title */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1 flex-shrink-0">
             <button
               id="calendar-prev-btn"
               onClick={handlePrev}
@@ -287,7 +287,7 @@ export default function CalendarPage() {
             </button>
           </div>
 
-          <h2 className="text-lg sm:text-xl font-bold text-primary-text dark:text-white truncate">
+          <h2 className="text-base sm:text-xl font-bold text-primary-text dark:text-white truncate min-w-0">
             {periodTitle}
           </h2>
         </div>
