@@ -38,3 +38,15 @@ test('Montra login page opens', async ({ page }) => {
   ).toBeVisible();
 });
 
+test('Montra registration page opens', async ({ page }) => {
+  const response = await page.goto(
+    'https://montra08.vercel.app/register'
+  );
+
+  expect(response).not.toBeNull();
+  expect(response!.status()).toBeLessThan(400);
+
+  await expect(page.locator('body')).toBeVisible();
+});
+
+
