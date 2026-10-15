@@ -14,14 +14,17 @@ import { AnimatedButton } from '../components/common/Button';
 import { ButtonShowcaseModal } from '../components/common/ButtonShowcaseModal';
 
 /* ─── Validation ─── */
-function validate({ emailOrPhone, password }) {
+function validate({ emailOrPhone, email, password }) {
+  const emailVal = (email || emailOrPhone || '').trim();
   const errors = {};
-  if (!emailOrPhone.trim()) {
+  if (!emailVal) {
+    errors.email = 'Email address is required.';
     errors.emailOrPhone = 'Email address is required.';
   } else if (
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailOrPhone) &&
-    !/^\+?[\d\s\-]{7,15}$/.test(emailOrPhone)
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal) &&
+    !/^\+?[\d\s\-]{7,15}$/.test(emailVal)
   ) {
+    errors.email = 'Enter a valid email address.';
     errors.emailOrPhone = 'Enter a valid email address.';
   }
   if (!password) {
@@ -40,6 +43,7 @@ export default function LoginPage() {
   const [showcaseOpen, setShowcaseOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('signin'); // 'signin' | 'signup'
   const [form, setForm] = useState({
+    email: '',
     emailOrPhone: '',
     password: '',
     rememberMe: true,
@@ -52,14 +56,28 @@ export default function LoginPage() {
 
   const handleChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
-    setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
+    const finalVal = type === 'checkbox' ? checked : value;
+    setForm((prev) => {
+      const updated = { ...prev, [name]: finalVal };
+      if (name === 'email' || name === 'emailOrPhone') {
+        updated.email = finalVal;
+        updated.emailOrPhone = finalVal;
+      }
+      return updated;
+    });
+    if (errors[name] || errors.email || errors.emailOrPhone) {
+      setErrors((prev) => ({ ...prev, [name]: '', email: '', emailOrPhone: '' }));
+    }
     if (apiError) setApiError('');
   }, [errors, apiError]);
 
   const handleBlur = useCallback((e) => {
     const { name } = e.target;
-    setTouched((prev) => ({ ...prev, [name]: true }));
+    setTouched((prev) => ({
+      ...prev,
+      [name]: true,
+      ...(name === 'email' || name === 'emailOrPhone' ? { email: true, emailOrPhone: true } : {}),
+    }));
     const fieldErrors = validate({ ...form, [name]: form[name] });
     if (fieldErrors[name]) setErrors((prev) => ({ ...prev, [name]: fieldErrors[name] }));
   }, [form]);
@@ -76,9 +94,10 @@ export default function LoginPage() {
     setSubmitStatus(null);
     setApiError('');
 
+    const emailToUse = form.email || form.emailOrPhone;
     const result = await login({
-      email: form.emailOrPhone,
-      emailOrPhone: form.emailOrPhone,
+      email: emailToUse,
+      emailOrPhone: emailToUse,
       password: form.password,
       rememberMe: form.rememberMe,
     });
@@ -309,9 +328,9 @@ export default function LoginPage() {
                     </div>
                     <input
                       id="login-email-input"
-                      type="text"
-                      name="emailOrPhone"
-                      value={form.emailOrPhone}
+                      type="email"
+                      name="email"
+                      value={form.email || form.emailOrPhone}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       inputMode="email"
@@ -320,14 +339,14 @@ export default function LoginPage() {
                       spellCheck={false}
                       placeholder="name@example.com"
                       className={`w-full pl-10 pr-4 py-3 rounded-2xl glass-input text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all outline-none ${
-                        errors.emailOrPhone && touched.emailOrPhone
+                        (errors.email || errors.emailOrPhone) && (touched.email || touched.emailOrPhone)
                           ? 'glass-input-error'
                           : ''
                       }`}
                     />
                   </div>
-                  {errors.emailOrPhone && touched.emailOrPhone && (
-                    <p className="text-[11px] text-red-500 mt-1">{errors.emailOrPhone}</p>
+                  {(errors.email || errors.emailOrPhone) && (touched.email || touched.emailOrPhone) && (
+                    <p className="text-[11px] text-red-500 mt-1">{errors.email || errors.emailOrPhone}</p>
                   )}
                 </div>
 

@@ -49,4 +49,14 @@ test('Montra registration page opens', async ({ page }) => {
   await expect(page.locator('body')).toBeVisible();
 });
 
+test('Montra login form has email and password fields', async ({ page }) => {
+  await page.goto('https://montra08.vercel.app/login');
 
+  await expect(
+    page.locator('input[type="password"]')
+  ).toBeVisible();
+
+  await expect(
+    page.locator('input[type="email"], input[name="email"]')
+  ).toBeVisible();
+});
