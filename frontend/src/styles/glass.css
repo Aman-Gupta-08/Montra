@@ -181,7 +181,6 @@
 .glass-3,
 .glass-modal,
 .glass-dropdown {
-  position: relative;
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.94) 0%,

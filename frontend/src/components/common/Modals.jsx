@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, X } from 'lucide-react';
 import { Button, AnimatedButton } from './Button';
@@ -10,6 +11,11 @@ export function DeleteConfirmModal({ isOpen, open, onClose, onConfirm, title, de
   const show = isOpen ?? open;
   const isBusy = isLoading ?? loading;
   const desc = description || message;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (show) {
@@ -25,7 +31,9 @@ export function DeleteConfirmModal({ isOpen, open, onClose, onConfirm, title, de
     }
   }, [show, isBusy, onClose]);
 
-  return (
+  if (!mounted || typeof document === 'undefined') return null;
+
+  return createPortal(
     <AnimatePresence>
       {show && (
         <>
@@ -34,7 +42,7 @@ export function DeleteConfirmModal({ isOpen, open, onClose, onConfirm, title, de
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-md"
+            className="!fixed inset-0 z-50 bg-black/60 backdrop-blur-md"
             onClick={!isBusy ? onClose : undefined}
           />
           {/* Dialog */}
@@ -43,7 +51,7 @@ export function DeleteConfirmModal({ isOpen, open, onClose, onConfirm, title, de
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none safe-area-all"
+            className="!fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none safe-area-all"
           >
             <div className="glass-modal glossy-panel rounded-2xl sm:rounded-3xl shadow-2xl border border-white/90 dark:border-white/20 w-full max-w-sm pointer-events-auto overflow-hidden">
               <div className="p-5 sm:p-6 relative z-10">
@@ -93,7 +101,8 @@ export function DeleteConfirmModal({ isOpen, open, onClose, onConfirm, title, de
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
 
@@ -102,6 +111,11 @@ export function DeleteConfirmModal({ isOpen, open, onClose, onConfirm, title, de
  */
 export function SlidePanel({ isOpen, open, onClose, title, children, width = 'max-w-lg' }) {
   const show = isOpen ?? open;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (show) {
@@ -117,7 +131,9 @@ export function SlidePanel({ isOpen, open, onClose, title, children, width = 'ma
     }
   }, [show, onClose]);
 
-  return (
+  if (!mounted || typeof document === 'undefined') return null;
+
+  return createPortal(
     <AnimatePresence>
       {show && (
         <>
@@ -125,7 +141,7 @@ export function SlidePanel({ isOpen, open, onClose, title, children, width = 'ma
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/45 backdrop-blur-md"
+            className="!fixed inset-0 z-50 bg-black/60 backdrop-blur-md"
             onClick={onClose}
           />
           <motion.div
@@ -133,10 +149,10 @@ export function SlidePanel({ isOpen, open, onClose, title, children, width = 'ma
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', stiffness: 320, damping: 35 }}
-            className={`fixed right-0 top-0 bottom-0 z-50 glass-3 border-l border-white/80 dark:border-white/15 shadow-2xl w-full ${width} flex flex-col overscroll-contain`}
+            className={`!fixed inset-y-0 right-0 top-0 bottom-0 z-50 glass-3 border-l border-white/80 dark:border-white/15 shadow-2xl w-full ${width} flex flex-col overscroll-contain h-full h-screen h-[100dvh]`}
           >
             {/* Header with Safe Area Top */}
-            <div className="flex items-center justify-between px-4 sm:px-6 pt-[max(env(safe-area-inset-top),1.25rem)] pb-4 sm:pb-5 border-b border-white/60 dark:border-white/10 flex-shrink-0">
+            <div className="flex items-center justify-between px-4 sm:px-6 pt-[max(env(safe-area-inset-top),1.25rem)] pb-4 sm:pb-5 border-b border-white/60 dark:border-white/10 flex-shrink-0 bg-white/40 dark:bg-black/20 backdrop-blur-md">
               <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate pr-2">{title}</h2>
               <button
                 onClick={onClose}
@@ -146,13 +162,14 @@ export function SlidePanel({ isOpen, open, onClose, title, children, width = 'ma
               </button>
             </div>
             {/* Scrollable content with Safe Area Bottom */}
-            <div className="flex-1 overflow-y-auto px-4 sm:px-6 pt-4 sm:pt-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] scrollbar-hide touch-scroll">
+            <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-5 pb-[max(env(safe-area-inset-bottom),2.5rem)] touch-scroll">
               {children}
             </div>
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
 

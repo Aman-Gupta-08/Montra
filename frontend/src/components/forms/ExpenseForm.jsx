@@ -256,7 +256,7 @@ export function ExpenseForm({ existing, onSuccess, onCancel }) {
       )}
 
       {/* Actions */}
-      <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:gap-3 pt-2">
+      <div className="sticky bottom-0 bg-white/95 dark:bg-[#161822]/95 backdrop-blur-md pt-3.5 pb-3 -mx-4 sm:-mx-6 px-4 sm:px-6 border-t border-gray-200/70 dark:border-white/10 z-20 flex flex-col-reverse sm:flex-row gap-2.5 sm:gap-3 mt-4 shadow-lg shadow-black/5">
         <Button
           type="button"
           variant="secondary"
