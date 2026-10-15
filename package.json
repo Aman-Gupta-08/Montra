@@ -1,0 +1,23 @@
+{
+  "name": "montra",
+  "version": "1.0.0",
+  "description": "Finora is a smart personal finance management platform tailored for Students, Employees, and Business Owners. The backend is built with Java 21, Spring Boot 3, and PostgreSQL.",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aman-Gupta-08/Montra.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Aman-Gupta-08/Montra/issues"
+  },
+  "homepage": "https://github.com/Aman-Gupta-08/Montra#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.5"
+  }
+}

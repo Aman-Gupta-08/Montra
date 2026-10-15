@@ -53,3 +53,10 @@ logs/
 finora.zip
 uploads/
 storage/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
