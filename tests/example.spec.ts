@@ -21,3 +21,20 @@ test('Montra homepage loads successfully', async ({ page }) => {
     `Browser errors: ${consoleErrors.join('\n')}`
   ).toEqual([]);
 });
+
+test('Montra login page opens', async ({ page }) => {
+  const response = await page.goto(
+    'https://montra08.vercel.app/login'
+  );
+
+  expect(response).not.toBeNull();
+  expect(response!.status()).toBeLessThan(400);
+
+  await expect(page.locator('body')).toBeVisible();
+
+  // Confirm that the page contains a login form.
+  await expect(
+    page.getByRole('button', { name: /login|sign in/i }).first()
+  ).toBeVisible();
+});
+
