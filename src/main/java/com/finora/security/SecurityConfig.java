@@ -97,7 +97,9 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(origins);
         configuration.setAllowedOriginPatterns(List.of(
-                "https://*.vercel.app"
+                "https://*.vercel.app",
+                "http://localhost:*",
+                "http://127.0.0.1:*"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"));
         configuration.setAllowedHeaders(List.of(

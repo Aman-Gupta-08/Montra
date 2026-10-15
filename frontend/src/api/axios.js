@@ -31,7 +31,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 15000, // 15s timeout for mobile network latency and cloud service wake-up
+  timeout: 60000, // 60s timeout to accommodate Render free tier cold starts (~30-50s)
 });
 
 // Request interceptor – attach JWT from localStorage or sessionStorage
