@@ -247,12 +247,12 @@ export function BudgetForm({ existing, onSuccess, onCancel }) {
       )}
 
       {/* Action Buttons */}
-      <div className="sticky bottom-0 bg-white/95 dark:bg-[#161822]/95 backdrop-blur-md pt-3.5 pb-3 -mx-4 sm:-mx-6 px-4 sm:px-6 border-t border-gray-200/70 dark:border-white/10 z-20 flex gap-3 mt-4 shadow-lg shadow-black/5">
+      <div className="sticky bottom-0 bg-white dark:bg-[#13151f] pt-3 pb-2 -mx-4 sm:-mx-6 px-4 sm:px-6 border-t border-gray-200 dark:border-white/10 z-20 flex flex-row items-center gap-2.5 sm:gap-3 mt-4 shadow-lg shadow-black/10">
         <Button
           type="button"
           variant="secondary"
           onClick={onCancel}
-          className="flex-1"
+          className="w-1/3 sm:w-auto sm:px-6 py-2.5"
         >
           Cancel
         </Button>

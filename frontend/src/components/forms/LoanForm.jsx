@@ -211,14 +211,14 @@ export function LoanForm({ existing, onSuccess, onCancel }) {
         </div>
       )}
 
-      <div className="sticky bottom-0 bg-white/95 dark:bg-[#161822]/95 backdrop-blur-md pt-3.5 pb-3 -mx-4 sm:-mx-6 px-4 sm:px-6 border-t border-gray-200/70 dark:border-white/10 z-20 flex gap-3 mt-4 shadow-lg shadow-black/5">
+      <div className="sticky bottom-0 bg-white dark:bg-[#13151f] pt-3 pb-2 -mx-4 sm:-mx-6 px-4 sm:px-6 border-t border-gray-200 dark:border-white/10 z-20 flex flex-row items-center gap-2.5 sm:gap-3 mt-4 shadow-lg shadow-black/10">
         <button type="button" onClick={onCancel}
-          className="flex-1 py-3 rounded-xl text-sm font-semibold border border-gray-200 dark:border-gray-700 text-primary-text dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-800 transition-all cursor-pointer">
+          className="w-1/3 sm:w-auto sm:px-6 py-2.5 sm:py-3 rounded-xl text-sm font-semibold border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all cursor-pointer">
           Cancel
         </button>
         <motion.button id="loan-submit-btn" type="submit" disabled={submitting}
           whileHover={{ scale: submitting ? 1 : 1.01 }} whileTap={{ scale: submitting ? 1 : 0.99 }}
-          className="flex-1 py-3 rounded-xl text-sm font-semibold text-white disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-violet-500/20"
+          className="flex-1 py-2.5 sm:py-3 rounded-xl text-sm font-semibold text-white disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-violet-500/20"
           style={{ background: 'linear-gradient(135deg, #7C5CFC, #10B981)' }}>
           {submitting ? (
             <><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="white" strokeWidth="4" /><path className="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Saving…</>

@@ -137,32 +137,37 @@ export function SlidePanel({ isOpen, open, onClose, title, children, width = 'ma
     <AnimatePresence>
       {show && (
         <>
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="!fixed inset-0 z-50 bg-black/60 backdrop-blur-md"
+            className="!fixed inset-0 z-[100] bg-black/65 backdrop-blur-sm"
             onClick={onClose}
           />
+          {/* Panel */}
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', stiffness: 320, damping: 35 }}
-            className={`!fixed inset-y-0 right-0 top-0 bottom-0 z-50 glass-3 border-l border-white/80 dark:border-white/15 shadow-2xl w-full ${width} flex flex-col overscroll-contain h-full h-screen h-[100dvh]`}
+            transition={{ type: 'spring', stiffness: 340, damping: 36 }}
+            className={`!fixed inset-y-0 right-0 top-0 bottom-0 z-[101] bg-white dark:bg-[#13151f] text-gray-900 dark:text-white border-l border-gray-200 dark:border-white/15 shadow-2xl w-full max-w-full sm:${width} flex flex-col overscroll-contain h-full h-screen h-[100dvh]`}
           >
             {/* Header with Safe Area Top */}
-            <div className="flex items-center justify-between px-4 sm:px-6 pt-[max(env(safe-area-inset-top),1.25rem)] pb-4 sm:pb-5 border-b border-white/60 dark:border-white/10 flex-shrink-0 bg-white/40 dark:bg-black/20 backdrop-blur-md">
+            <div className="flex items-center justify-between px-4 sm:px-6 pt-[max(env(safe-area-inset-top),1.25rem)] pb-3.5 sm:pb-4 border-b border-gray-200/80 dark:border-white/10 flex-shrink-0 bg-white/95 dark:bg-[#13151f] backdrop-blur-md z-10">
               <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate pr-2">{title}</h2>
               <button
+                type="button"
+                id="close-slide-panel-btn"
                 onClick={onClose}
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-secondary-text hover:text-primary-text hover:bg-white/40 dark:hover:bg-white/10 transition-all flex-shrink-0"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-all flex-shrink-0 cursor-pointer"
+                aria-label="Close panel"
               >
                 <X size={18} />
               </button>
             </div>
             {/* Scrollable content with Safe Area Bottom */}
-            <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-5 pb-[max(env(safe-area-inset-bottom),2.5rem)] touch-scroll">
+            <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-4 sm:py-5 pb-8 touch-scroll">
               {children}
             </div>
           </motion.div>
