@@ -65,6 +65,11 @@ public class LoanService {
     @SuppressWarnings("null")
     public LoanResponse createLoan(LoanRequest request, String email) {
         User user = getUser(email);
+        LoanStatus initialStatus = LoanStatus.ACTIVE;
+        if (request.getDueDate() != null && request.getDueDate().isBefore(LocalDate.now())) {
+            initialStatus = LoanStatus.OVERDUE;
+        }
+
         Loan loan = Loan.builder()
                 .user(user)
                 .personName(request.getPersonName())
@@ -74,7 +79,7 @@ public class LoanService {
                 .remainingAmount(request.getOriginalAmount())
                 .startDate(request.getStartDate())
                 .dueDate(request.getDueDate())
-                .status(LoanStatus.ACTIVE)
+                .status(initialStatus)
                 .description(request.getDescription())
                 .build();
         
@@ -92,6 +97,35 @@ public class LoanService {
         loan.setPersonName(request.getPersonName());
         loan.setPersonPhone(request.getPersonPhone());
         loan.setDescription(request.getDescription());
+        if (request.getType() != null) {
+            loan.setType(request.getType());
+        }
+        if (request.getStartDate() != null) {
+            loan.setStartDate(request.getStartDate());
+        }
+        loan.setDueDate(request.getDueDate());
+
+        if (request.getOriginalAmount() != null) {
+            BigDecimal oldOriginal = loan.getOriginalAmount() != null ? loan.getOriginalAmount() : BigDecimal.ZERO;
+            BigDecimal oldRemaining = loan.getRemainingAmount() != null ? loan.getRemainingAmount() : BigDecimal.ZERO;
+            BigDecimal paidSoFar = oldOriginal.subtract(oldRemaining);
+            if (paidSoFar.compareTo(BigDecimal.ZERO) < 0) {
+                paidSoFar = BigDecimal.ZERO;
+            }
+            loan.setOriginalAmount(request.getOriginalAmount());
+            BigDecimal newRemaining = request.getOriginalAmount().subtract(paidSoFar);
+            if (newRemaining.compareTo(BigDecimal.ZERO) <= 0) {
+                newRemaining = BigDecimal.ZERO;
+                loan.setStatus(LoanStatus.PAID);
+            } else if (paidSoFar.compareTo(BigDecimal.ZERO) > 0) {
+                loan.setStatus(LoanStatus.PARTIALLY_PAID);
+            } else if (loan.getDueDate() != null && loan.getDueDate().isBefore(LocalDate.now())) {
+                loan.setStatus(LoanStatus.OVERDUE);
+            } else {
+                loan.setStatus(LoanStatus.ACTIVE);
+            }
+            loan.setRemainingAmount(newRemaining);
+        }
         
         loan = loanRepository.save(loan);
         return mapToResponse(loan);

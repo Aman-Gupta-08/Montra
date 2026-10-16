@@ -21,13 +21,15 @@ const today = () => new Date().toISOString().split('T')[0];
 
 /* ─── Progress bar (uses backend remainingAmount, not computed) ─── */
 function RepaymentBar({ originalAmount, remainingAmount }) {
-  const paid = Math.max(0, parseFloat(originalAmount || 0) - parseFloat(remainingAmount || 0));
-  const pct = originalAmount > 0 ? Math.min(100, (paid / parseFloat(originalAmount)) * 100) : 0;
+  const orig = parseFloat(originalAmount || 0);
+  const rem = parseFloat(remainingAmount ?? orig);
+  const paid = Math.max(0, orig - rem);
+  const pct = orig > 0 ? Math.min(100, Math.max(0, (paid / orig) * 100)) : 0;
   return (
     <div>
       <div className="flex justify-between text-xs text-secondary-text mb-1.5">
         <span>Paid: {fmt(paid)}</span>
-        <span>Remaining: {fmt(remainingAmount)}</span>
+        <span>Remaining: {fmt(rem)}</span>
       </div>
       <div className="h-2 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
         <motion.div
@@ -52,7 +54,9 @@ function AddPaymentForm({ loan, onSuccess, onCancel }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  const remaining = parseFloat(loan.remainingAmount || 0);
+  const isLent = loan.type === 'LENT';
+  const person = loan.personName || loan.borrowerName || loan.lenderName || 'Contact';
+  const remaining = parseFloat(loan.remainingAmount ?? loan.amount ?? loan.originalAmount ?? 0);
 
   const handleFull = () => setAmount(String(remaining));
 
@@ -84,15 +88,15 @@ function AddPaymentForm({ loan, onSuccess, onCancel }) {
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between">
           <label className="text-sm font-medium text-primary-text dark:text-gray-200">
-            Amount (₹) <span className="text-red-500">*</span>
+            {isLent ? 'Repayment Amount (₹)' : 'Payment Amount (₹)'} <span className="text-red-500">*</span>
           </label>
           <button
             type="button"
             id="pay-full-btn"
             onClick={handleFull}
-            className="text-xs text-violet-600 hover:text-violet-700 font-medium transition-colors"
+            className="text-xs text-violet-600 dark:text-violet-400 hover:underline font-medium transition-colors"
           >
-            Pay in full ({fmt(remaining)})
+            {isLent ? `Collect in full (${fmt(remaining)})` : `Pay in full (${fmt(remaining)})`}
           </button>
         </div>
         <input
@@ -120,14 +124,14 @@ function AddPaymentForm({ loan, onSuccess, onCancel }) {
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-primary-text dark:text-gray-200">Method</label>
+          <label className="text-sm font-medium text-primary-text dark:text-gray-200">Payment Method</label>
           <select
             id="payment-method"
             value={paymentMethod}
             onChange={(e) => setPaymentMethod(e.target.value)}
             className="w-full h-10 px-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-primary-text dark:text-gray-100 outline-none focus:border-violet-400 transition-all"
           >
-            <option value="">— Method —</option>
+            <option value="">— Select Method —</option>
             {PAYMENT_METHODS.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
           </select>
         </div>
@@ -138,7 +142,7 @@ function AddPaymentForm({ loan, onSuccess, onCancel }) {
         <input
           id="payment-note"
           type="text"
-          placeholder="e.g. First instalment"
+          placeholder={isLent ? `e.g. Received via GPay from ${person}` : `e.g. Sent instalment to ${person}`}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           className="w-full h-10 px-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-primary-text dark:text-gray-100 placeholder:text-gray-400 outline-none focus:border-violet-400 transition-all"
@@ -164,13 +168,12 @@ function AddPaymentForm({ loan, onSuccess, onCancel }) {
         </Button>
         <Button
           id="submit-payment-btn"
-          action="markAsPaid"
           type="submit"
           isLoading={submitting}
           size="sm"
           className="flex-1"
         >
-          Record Payment
+          {isLent ? 'Record Repayment' : 'Record Payment'}
         </Button>
       </div>
     </form>
@@ -353,31 +356,52 @@ function PaymentHistory({ loanId }) {
 /* ═══════════════════════════════════════════════════════════════
    LOAN DETAIL PANEL — shown inside a SlidePanel
 ════════════════════════════════════════════════════════════════ */
-export function LoanDetailPanel({ loan, onClose, onUpdate }) {
+export function LoanDetailPanel({ loan, onClose, onUpdate, onEdit }) {
   const [subPanel, setSubPanel] = useState(null); // null | 'payment' | 'extend'
+  const isLent = loan.type === 'LENT';
+  const person = loan.personName || loan.borrowerName || loan.lenderName || 'Contact';
+  const origAmount = parseFloat(loan.originalAmount ?? loan.amount ?? 0);
+  const remAmount = parseFloat(loan.remainingAmount ?? loan.amount ?? origAmount);
+  const paidAmount = Math.max(0, origAmount - remAmount);
   const statusCfg = getLoanStatusConfig(loan.status);
-  const isFullyPaid = loan.status === 'PAID';
+  const isFullyPaid = loan.status === 'PAID' || remAmount <= 0;
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Status badge */}
-      <div className="flex items-center gap-3">
+      {/* Status badge & Loan Type */}
+      <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
         <span
           className="px-3 py-1 rounded-full text-xs font-semibold"
           style={{ background: statusCfg.bg, color: statusCfg.text }}
         >
           {statusCfg.label}
         </span>
-        <span className={`text-sm font-medium ${loan.type === 'LENT' ? 'text-green-600' : 'text-violet-600'}`}>
-          {loan.type === 'LENT' ? '💸 You lent' : '🤝 You borrowed'}
+        <span className={`text-xs sm:text-sm font-semibold px-2.5 py-1 rounded-full ${
+          isLent ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300'
+        }`}>
+          {isLent ? '💸 Money Lent (Owed to you)' : '🤝 Money Borrowed (You owe)'}
         </span>
       </div>
 
       {/* Person info */}
-      <div className="bg-gray-50 dark:bg-gray-800/60 rounded-2xl p-4 flex flex-col gap-2">
+      <div className="bg-gray-50 dark:bg-gray-800/60 rounded-2xl p-4 flex flex-col gap-2.5 border border-gray-100 dark:border-gray-800">
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-secondary-text">
+            {isLent ? 'Borrower Contact' : 'Lender Contact'}
+          </span>
+          {onEdit && (
+            <button
+              type="button"
+              onClick={() => onEdit(loan)}
+              className="text-xs text-violet-600 dark:text-violet-400 hover:underline flex items-center gap-1 font-medium"
+            >
+              <Pencil size={12} /> Edit Details
+            </button>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           <User size={15} className="text-secondary-text flex-shrink-0" />
-          <span className="text-sm font-semibold text-primary-text dark:text-white">{loan.personName}</span>
+          <span className="text-sm font-semibold text-primary-text dark:text-white">{person}</span>
         </div>
         {loan.personPhone && (
           <div className="flex items-center gap-2">
@@ -385,42 +409,42 @@ export function LoanDetailPanel({ loan, onClose, onUpdate }) {
             <span className="text-sm text-secondary-text">{loan.personPhone}</span>
           </div>
         )}
-        {loan.description && (
-          <p className="text-xs text-secondary-text mt-1 border-t border-gray-200 dark:border-gray-700 pt-2">{loan.description}</p>
+        {(loan.description || loan.notes) && (
+          <p className="text-xs text-secondary-text mt-0.5 border-t border-gray-200 dark:border-gray-700 pt-2">{loan.description || loan.notes}</p>
         )}
       </div>
 
       {/* Amounts */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
         {[
-          { label: 'Original', value: loan.originalAmount, color: '#7C5CFC' },
-          { label: 'Paid', value: parseFloat(loan.originalAmount || 0) - parseFloat(loan.remainingAmount || 0), color: '#10B981' },
-          { label: 'Remaining', value: loan.remainingAmount, color: '#EF4444' },
+          { label: 'Original', value: origAmount, color: '#7C5CFC' },
+          { label: 'Paid', value: paidAmount, color: '#10B981' },
+          { label: 'Remaining', value: remAmount, color: '#EF4444' },
         ].map((s) => (
           <div key={s.label} className="bg-white dark:bg-gray-900 rounded-xl p-3 border border-gray-100 dark:border-gray-800 text-center">
-            <p className="text-xs text-secondary-text mb-1">{s.label}</p>
-            <p className="text-sm font-bold" style={{ color: s.color }}>{fmt(s.value)}</p>
+            <p className="text-[11px] sm:text-xs text-secondary-text mb-1">{s.label}</p>
+            <p className="text-xs sm:text-sm md:text-base font-bold truncate" style={{ color: s.color }}>{fmt(s.value)}</p>
           </div>
         ))}
       </div>
 
-      {/* Progress bar — uses backend remainingAmount as source of truth */}
-      <RepaymentBar originalAmount={loan.originalAmount} remainingAmount={loan.remainingAmount} />
+      {/* Progress bar */}
+      <RepaymentBar originalAmount={origAmount} remainingAmount={remAmount} />
 
       {/* Dates */}
       <div className="grid grid-cols-2 gap-3">
         <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800/60 rounded-xl">
           <Calendar size={15} className="text-secondary-text flex-shrink-0" />
           <div>
-            <p className="text-xs text-secondary-text">Start</p>
+            <p className="text-xs text-secondary-text">Start Date</p>
             <p className="text-sm font-medium text-primary-text dark:text-white">{fmtDate(loan.startDate)}</p>
           </div>
         </div>
         <div className={`flex items-center gap-2 p-3 rounded-xl ${!loan.dueDate ? 'bg-gray-50 dark:bg-gray-800/60' : new Date(loan.dueDate) < new Date() && !isFullyPaid ? 'bg-red-50 dark:bg-red-900/20' : 'bg-gray-50 dark:bg-gray-800/60'}`}>
           <CalendarDays size={15} className={!loan.dueDate ? 'text-secondary-text' : new Date(loan.dueDate) < new Date() && !isFullyPaid ? 'text-red-500' : 'text-secondary-text'} />
           <div>
-            <p className="text-xs text-secondary-text">Due</p>
-            <p className={`text-sm font-medium ${!loan.dueDate ? 'text-secondary-text' : new Date(loan.dueDate) < new Date() && !isFullyPaid ? 'text-red-500' : 'text-primary-text dark:text-white'}`}>
+            <p className="text-xs text-secondary-text">Due Date</p>
+            <p className={`text-sm font-medium ${!loan.dueDate ? 'text-secondary-text' : new Date(loan.dueDate) < new Date() && !isFullyPaid ? 'text-red-500 font-semibold' : 'text-primary-text dark:text-white'}`}>
               {fmtDate(loan.dueDate)}
             </p>
           </div>
@@ -435,13 +459,13 @@ export function LoanDetailPanel({ loan, onClose, onUpdate }) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setSubPanel(subPanel === 'payment' ? null : 'payment')}
-            className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
               subPanel === 'payment' ? 'bg-violet-100 dark:bg-violet-900/30 text-violet-700' : 'text-white'
             }`}
             style={subPanel !== 'payment' ? { background: 'linear-gradient(135deg, #7C5CFC, #10B981)' } : {}}
           >
             <Plus size={15} />
-            Add Payment
+            {isLent ? 'Collect Repayment' : 'Record Payment'}
           </motion.button>
 
           <motion.button
@@ -449,7 +473,7 @@ export function LoanDetailPanel({ loan, onClose, onUpdate }) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setSubPanel(subPanel === 'extend' ? null : 'extend')}
-            className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold border-2 transition-all ${
+            className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold border-2 transition-all cursor-pointer ${
               subPanel === 'extend'
                 ? 'border-violet-400 bg-violet-50 dark:bg-violet-900/20 text-violet-700'
                 : 'border-gray-200 dark:border-gray-700 text-primary-text dark:text-gray-200 hover:border-violet-300'

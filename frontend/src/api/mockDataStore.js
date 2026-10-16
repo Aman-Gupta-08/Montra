@@ -5,7 +5,7 @@
  * backend or PostgreSQL database is offline.
  */
 
-const STORAGE_KEY = 'montra_mock_db_v1';
+const STORAGE_KEY = 'montra_mock_db_v2';
 
 function getInitialData() {
   return {
@@ -143,39 +143,69 @@ function getInitialData() {
     loans: [
       {
         id: 1,
-        borrowerName: 'Rahul Verma',
-        amount: 5000,
+        personName: 'Rahul Verma',
+        personPhone: '+91 9876543210',
+        originalAmount: 5000,
         remainingAmount: 2500,
-        interestRate: 0,
         startDate: '2026-08-01',
-        dueDate: '2026-10-15',
-        status: 'ACTIVE',
+        dueDate: '2026-10-25',
+        status: 'PARTIALLY_PAID',
         type: 'LENT',
-        notes: 'Semester textbooks share',
+        description: 'Semester textbooks share',
+        payments: [
+          {
+            id: 101,
+            loanId: 1,
+            amount: 2500,
+            paymentDate: '2026-09-15',
+            paymentMethod: 'UPI',
+            description: 'Half payment transferred via GPay',
+          },
+        ],
       },
       {
         id: 2,
-        borrowerName: 'Priya Sharma',
-        amount: 3000,
+        personName: 'Priya Sharma',
+        personPhone: '+91 9812345678',
+        originalAmount: 3000,
         remainingAmount: 1000,
-        interestRate: 0,
         startDate: '2026-09-01',
-        dueDate: '2026-10-30',
-        status: 'ACTIVE',
+        dueDate: '2026-11-15',
+        status: 'PARTIALLY_PAID',
         type: 'LENT',
-        notes: 'Hackathon ticket sponsorship',
+        description: 'Hackathon ticket sponsorship',
+        payments: [
+          {
+            id: 102,
+            loanId: 2,
+            amount: 2000,
+            paymentDate: '2026-09-20',
+            paymentMethod: 'NET_BANKING',
+            description: 'Round 1 reimbursement',
+          },
+        ],
       },
       {
         id: 3,
-        lenderName: 'Campus Tech Store',
-        amount: 2000,
+        personName: 'Campus Tech Store',
+        personPhone: '+91 9900112233',
+        originalAmount: 2000,
         remainingAmount: 800,
-        interestRate: 0,
         startDate: '2026-08-15',
         dueDate: '2026-10-01',
-        status: 'ACTIVE',
+        status: 'OVERDUE',
         type: 'BORROWED',
-        notes: 'Hardware component installment',
+        description: 'Hardware component installment',
+        payments: [
+          {
+            id: 103,
+            loanId: 3,
+            amount: 1200,
+            paymentDate: '2026-09-05',
+            paymentMethod: 'DEBIT_CARD',
+            description: 'Downpayment',
+          },
+        ],
       },
     ],
     recurring: [
@@ -269,12 +299,33 @@ function getInitialData() {
 function loadDB() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
+    let parsed;
     if (!raw) {
-      const initial = getInitialData();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
-      return initial;
+      parsed = getInitialData();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+    } else {
+      parsed = JSON.parse(raw);
     }
-    return JSON.parse(raw);
+    // Self-heal and normalize loans if loaded from older structure
+    if (parsed && Array.isArray(parsed.loans)) {
+      parsed.loans = parsed.loans.map((l) => ({
+        id: l.id,
+        personName: l.personName || l.borrowerName || l.lenderName || 'Contact',
+        personPhone: l.personPhone || '',
+        type: l.type || 'LENT',
+        originalAmount: parseFloat(l.originalAmount ?? l.amount ?? 0),
+        remainingAmount: parseFloat(l.remainingAmount ?? l.amount ?? l.originalAmount ?? 0),
+        startDate: l.startDate || '2026-08-01',
+        dueDate: l.dueDate || null,
+        status: l.status || 'ACTIVE',
+        description: l.description || l.notes || '',
+        payments: Array.isArray(l.payments) ? l.payments : [],
+        history: Array.isArray(l.history) ? l.history : [],
+        createdAt: l.createdAt || new Date().toISOString(),
+        updatedAt: l.updatedAt || new Date().toISOString(),
+      }));
+    }
+    return parsed;
   } catch {
     return getInitialData();
   }
@@ -320,15 +371,158 @@ export function handleMockRequest(url, method = 'get', data = null, params = nul
     return db.loans.filter((l) => l.type === 'BORROWED');
   }
   if (cleanUrl === '/loans/overdue') {
-    return db.loans.filter((l) => l.status === 'OVERDUE');
+    const todayStr = new Date().toISOString().split('T')[0];
+    return db.loans.filter((l) => l.status === 'OVERDUE' || (l.dueDate && l.dueDate < todayStr && Number(l.remainingAmount) > 0));
   }
   if (cleanUrl === '/loans') {
     if (verb === 'get') return db.loans;
     if (verb === 'post') {
-      const newItem = { id: Date.now(), ...data, remainingAmount: data.amount, status: 'ACTIVE' };
-      db.loans.push(newItem);
+      const origAmt = parseFloat(data.originalAmount || data.amount || 0);
+      const todayStr = new Date().toISOString().split('T')[0];
+      const isOverdue = Boolean(data.dueDate && data.dueDate < todayStr);
+      const newItem = {
+        id: Date.now(),
+        personName: (data.personName || data.borrowerName || data.lenderName || 'Unnamed').trim(),
+        personPhone: data.personPhone ? data.personPhone.trim() : '',
+        type: data.type || 'LENT',
+        originalAmount: origAmt,
+        remainingAmount: origAmt,
+        startDate: data.startDate || todayStr,
+        dueDate: data.dueDate || null,
+        status: isOverdue ? 'OVERDUE' : 'ACTIVE',
+        description: (data.description || data.notes || '').trim(),
+        payments: [],
+        history: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      db.loans.unshift(newItem);
       saveDB(db);
       return newItem;
+    }
+  }
+
+  // Loan Payments: /loans/:id/payments
+  const loanPaymentsMatch = cleanUrl.match(/^\/loans\/(\d+)\/payments$/);
+  if (loanPaymentsMatch) {
+    const loanId = parseInt(loanPaymentsMatch[1], 10);
+    const loan = db.loans.find((l) => l.id === loanId);
+    if (!loan) return [];
+
+    if (verb === 'get') {
+      return loan.payments || [];
+    }
+    if (verb === 'post') {
+      const payAmt = parseFloat(data.amount || 0);
+      const currentRem = parseFloat(loan.remainingAmount ?? loan.originalAmount ?? 0);
+      const newRem = Math.max(0, currentRem - payAmt);
+      loan.remainingAmount = newRem;
+      if (newRem === 0) {
+        loan.status = 'PAID';
+      } else {
+        loan.status = 'PARTIALLY_PAID';
+      }
+      const newPayment = {
+        id: Date.now(),
+        loanId,
+        amount: payAmt,
+        paymentDate: data.paymentDate || new Date().toISOString().split('T')[0],
+        paymentMethod: data.paymentMethod || 'CASH',
+        description: (data.description || '').trim(),
+        createdAt: new Date().toISOString(),
+      };
+      if (!Array.isArray(loan.payments)) loan.payments = [];
+      loan.payments.unshift(newPayment);
+      saveDB(db);
+      return newPayment;
+    }
+  }
+
+  // Loan Extend Due Date: /loans/:id/extend
+  const loanExtendMatch = cleanUrl.match(/^\/loans\/(\d+)\/extend$/);
+  if (loanExtendMatch && verb === 'patch') {
+    const loanId = parseInt(loanExtendMatch[1], 10);
+    const loan = db.loans.find((l) => l.id === loanId);
+    if (loan) {
+      const newDueDate = data?.newDueDate;
+      const oldDueDate = loan.dueDate;
+      loan.dueDate = newDueDate;
+      const todayStr = new Date().toISOString().split('T')[0];
+      if (loan.status === 'OVERDUE' && newDueDate > todayStr) {
+        const paidSoFar = (loan.originalAmount || 0) - (loan.remainingAmount || 0);
+        loan.status = paidSoFar > 0 ? 'PARTIALLY_PAID' : 'ACTIVE';
+      }
+      if (!Array.isArray(loan.history)) loan.history = [];
+      loan.history.push({
+        oldDueDate,
+        newDueDate,
+        extendedAt: new Date().toISOString(),
+      });
+      saveDB(db);
+      return loan;
+    }
+  }
+
+  // Loan Status update: /loans/:id/status
+  const loanStatusMatch = cleanUrl.match(/^\/loans\/(\d+)\/status$/);
+  if (loanStatusMatch && verb === 'patch') {
+    const loanId = parseInt(loanStatusMatch[1], 10);
+    const loan = db.loans.find((l) => l.id === loanId);
+    if (loan && params?.status) {
+      loan.status = params.status;
+      saveDB(db);
+      return loan;
+    }
+  }
+
+  // Single Loan detail / update / delete: /loans/:id
+  const loanSingleMatch = cleanUrl.match(/^\/loans\/(\d+)$/);
+  if (loanSingleMatch) {
+    const loanId = parseInt(loanSingleMatch[1], 10);
+    const loanIndex = db.loans.findIndex((l) => l.id === loanId);
+    if (verb === 'get') {
+      return db.loans[loanIndex] || null;
+    }
+    if (verb === 'delete') {
+      if (loanIndex !== -1) {
+        db.loans.splice(loanIndex, 1);
+        saveDB(db);
+      }
+      return { success: true };
+    }
+    if (verb === 'put') {
+      if (loanIndex !== -1) {
+        const existing = db.loans[loanIndex];
+        const newOriginal = data.originalAmount ? parseFloat(data.originalAmount) : existing.originalAmount;
+        const paidSoFar = Math.max(0, (existing.originalAmount || 0) - (existing.remainingAmount || 0));
+        const newRemaining = Math.max(0, newOriginal - paidSoFar);
+        const todayStr = new Date().toISOString().split('T')[0];
+        let newStatus = existing.status;
+        if (newRemaining === 0) {
+          newStatus = 'PAID';
+        } else if (paidSoFar > 0) {
+          newStatus = 'PARTIALLY_PAID';
+        } else if (data.dueDate && data.dueDate < todayStr) {
+          newStatus = 'OVERDUE';
+        } else {
+          newStatus = 'ACTIVE';
+        }
+        db.loans[loanIndex] = {
+          ...existing,
+          personName: data.personName ? data.personName.trim() : existing.personName,
+          personPhone: data.personPhone !== undefined ? (data.personPhone ? data.personPhone.trim() : '') : existing.personPhone,
+          type: data.type || existing.type,
+          originalAmount: newOriginal,
+          remainingAmount: newRemaining,
+          startDate: data.startDate || existing.startDate,
+          dueDate: data.dueDate !== undefined ? data.dueDate : existing.dueDate,
+          description: data.description !== undefined ? data.description.trim() : existing.description,
+          status: newStatus,
+          updatedAt: new Date().toISOString(),
+        };
+        saveDB(db);
+        return db.loans[loanIndex];
+      }
     }
   }
 

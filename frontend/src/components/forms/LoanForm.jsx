@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { AlertCircle } from 'lucide-react';
 import { InputField } from './InputField';
+import { AnimatedButton } from '../common/Button';
 import { loanService } from '../../services/loanRecurringService';
 
 const today = () => new Date().toISOString().split('T')[0];
@@ -18,8 +19,8 @@ const EMPTY = {
 
 function validate(form) {
   const e = {};
-  if (!form.personName.trim()) e.personName = 'Person name is required.';
-  if (!form.type) e.type = 'Select a loan type.';
+  if (!form.personName.trim()) e.personName = 'Name is required.';
+  if (!form.type) e.type = 'Select whether you lent or borrowed this money.';
   if (!form.originalAmount || isNaN(parseFloat(form.originalAmount)) || parseFloat(form.originalAmount) <= 0)
     e.originalAmount = 'Enter a valid positive amount.';
   if (!form.startDate) e.startDate = 'Start date is required.';
@@ -30,13 +31,13 @@ export function LoanForm({ existing, onSuccess, onCancel }) {
   const [form, setForm] = useState(() =>
     existing
       ? {
-          personName: existing.personName || '',
+          personName: existing.personName || existing.borrowerName || existing.lenderName || '',
           personPhone: existing.personPhone || '',
           type: existing.type || '',
-          originalAmount: String(existing.originalAmount ?? ''),
+          originalAmount: String(existing.originalAmount ?? existing.amount ?? ''),
           startDate: existing.startDate || today(),
           dueDate: existing.dueDate || '',
-          description: existing.description || '',
+          description: existing.description || existing.notes || '',
         }
       : { ...EMPTY }
   );
@@ -45,6 +46,9 @@ export function LoanForm({ existing, onSuccess, onCancel }) {
   const [touched, setTouched] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+
+  const isLent = form.type === 'LENT';
+  const isBorrowed = form.type === 'BORROWED';
 
   const set = useCallback((field, value) => {
     setForm((p) => ({ ...p, [field]: value }));
@@ -93,6 +97,24 @@ export function LoanForm({ existing, onSuccess, onCancel }) {
     }
   };
 
+  const personLabel = isLent
+    ? 'Borrower Name (Who took the money?)'
+    : isBorrowed
+    ? 'Lender Name (Who gave you the money?)'
+    : 'Person / Contact Name';
+
+  const personPlaceholder = isLent
+    ? 'e.g. Rahul Verma, John'
+    : isBorrowed
+    ? 'e.g. HDFC Bank, Amit Kumar'
+    : 'Full name';
+
+  const personHint = isLent
+    ? 'Person who owes you this money'
+    : isBorrowed
+    ? 'Person or institution you owe this money to'
+    : '';
+
   return (
     <form id="loan-form" onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
       {/* Type selector */}
@@ -102,23 +124,23 @@ export function LoanForm({ existing, onSuccess, onCancel }) {
         </label>
         <div className="grid grid-cols-2 gap-3">
           {[
-            { value: 'LENT', label: '💸 I Lent Money', desc: 'Someone owes you', color: '#10B981', bg: '#E6F7E4' },
-            { value: 'BORROWED', label: '🤝 I Borrowed', desc: 'You owe someone', color: '#7C5CFC', bg: '#EDEBF7' },
+            { value: 'LENT', label: '💸 I Lent Money', desc: 'Someone owes you (You receive back)', color: '#10B981', bg: '#E6F7E4' },
+            { value: 'BORROWED', label: '🤝 I Borrowed', desc: 'You owe someone (You pay back)', color: '#7C5CFC', bg: '#EDEBF7' },
           ].map((t) => (
             <button
               key={t.value}
               type="button"
               id={`loan-type-${t.value}`}
               onClick={() => set('type', t.value)}
-              className={`p-4 rounded-xl border-2 text-left transition-all ${
+              className={`p-3.5 sm:p-4 rounded-xl border-2 text-left transition-all ${
                 form.type === t.value
-                  ? 'border-violet-400 shadow-sm'
-                  : 'border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700'
+                  ? 'border-violet-500 dark:border-violet-400 shadow-sm'
+                  : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'
               }`}
               style={form.type === t.value ? { background: t.bg } : {}}
             >
               <p className="text-sm font-semibold text-primary-text dark:text-white">{t.label}</p>
-              <p className="text-xs text-secondary-text mt-0.5">{t.desc}</p>
+              <p className="text-xs text-secondary-text mt-0.5 leading-snug">{t.desc}</p>
             </button>
           ))}
         </div>
@@ -130,13 +152,14 @@ export function LoanForm({ existing, onSuccess, onCancel }) {
       {/* Person name */}
       <InputField
         id="personName"
-        label="Person Name"
+        label={personLabel}
         type="text"
-        placeholder="Full name"
+        placeholder={personPlaceholder}
         value={form.personName}
         onChange={handleChange}
         onBlur={handleBlur}
         error={touched.personName ? errors.personName : ''}
+        hint={personHint}
         required
       />
 
@@ -212,18 +235,30 @@ export function LoanForm({ existing, onSuccess, onCancel }) {
       )}
 
       <div className="sticky bottom-0 bg-white/95 dark:bg-[#13151f]/95 backdrop-blur-md pt-3 pb-[max(env(safe-area-inset-bottom,0px),1.25rem)] -mx-4 sm:-mx-6 px-4 sm:px-6 border-t border-gray-200/80 dark:border-white/10 z-20 flex flex-row items-center gap-2.5 sm:gap-3 mt-4 shadow-[0_-4px_16px_rgba(0,0,0,0.12)]">
-        <button type="button" onClick={onCancel}
-          className="w-1/3 sm:w-auto sm:px-6 py-2.5 sm:py-3 rounded-xl text-sm font-semibold border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all cursor-pointer">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="w-1/3 sm:w-auto sm:px-6 py-2.5 sm:py-3 rounded-xl text-sm font-semibold border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all cursor-pointer"
+        >
           Cancel
         </button>
-        <motion.button id="loan-submit-btn" type="submit" disabled={submitting}
-          whileHover={{ scale: submitting ? 1 : 1.01 }} whileTap={{ scale: submitting ? 1 : 0.99 }}
-          className="flex-1 py-2.5 sm:py-3 rounded-xl text-sm font-semibold text-white disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-violet-500/20"
-          style={{ background: 'linear-gradient(135deg, #7C5CFC, #10B981)' }}>
-          {submitting ? (
-            <><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="white" strokeWidth="4" /><path className="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Saving…</>
-          ) : (existing ? 'Update Loan' : 'Create Loan')}
-        </motion.button>
+        <AnimatedButton
+          id="loan-submit-btn"
+          type="submit"
+          size="md"
+          loading={submitting}
+          fullWidth
+          wrapperClassName="flex-1"
+          className="w-full"
+        >
+          {existing
+            ? 'Update Loan'
+            : isLent
+            ? 'Record Lent Money'
+            : isBorrowed
+            ? 'Record Borrowed Money'
+            : 'Save Loan'}
+        </AnimatedButton>
       </div>
     </form>
   );

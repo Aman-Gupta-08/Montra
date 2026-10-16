@@ -1,7 +1,6 @@
 package com.finora.dto.request;
 
 import com.finora.entity.LoanType;
-import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -27,7 +26,6 @@ public class LoanRequest {
     @NotNull(message = "Start date is required")
     private LocalDate startDate;
 
-    @FutureOrPresent(message = "Due date must be in the present or future")
     private LocalDate dueDate;
 
     private String description;

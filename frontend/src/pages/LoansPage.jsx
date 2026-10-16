@@ -31,21 +31,24 @@ const TAB_LABELS = [
 /* ─── Summary Cards ─── */
 function SummaryCards({ loans }) {
   const totalLent = useMemo(
-    () => loans.filter((l) => l.type === 'LENT').reduce((s, l) => s + parseFloat(l.remainingAmount || 0), 0),
+    () => loans.filter((l) => l.type === 'LENT').reduce((s, l) => s + parseFloat(l.remainingAmount ?? l.amount ?? l.originalAmount ?? 0), 0),
     [loans]
   );
   const totalBorrowed = useMemo(
-    () => loans.filter((l) => l.type === 'BORROWED').reduce((s, l) => s + parseFloat(l.remainingAmount || 0), 0),
+    () => loans.filter((l) => l.type === 'BORROWED').reduce((s, l) => s + parseFloat(l.remainingAmount ?? l.amount ?? l.originalAmount ?? 0), 0),
     [loans]
   );
-  const overdueCount = useMemo(() => loans.filter((l) => l.status === 'OVERDUE').length, [loans]);
+  const overdueCount = useMemo(() => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    return loans.filter((l) => l.status === 'OVERDUE' || (l.dueDate && l.dueDate < todayStr && parseFloat(l.remainingAmount ?? l.amount ?? l.originalAmount ?? 0) > 0)).length;
+  }, [loans]);
 
   return (
     <div className="grid grid-cols-3 gap-2 sm:gap-4">
       {[
-        { label: 'Total Lent', value: fmt(totalLent), color: '#10B981', bg: '#E6F7E4', icon: TrendingUp },
-        { label: 'Total Borrowed', value: fmt(totalBorrowed), color: '#7C5CFC', bg: '#EDEBF7', icon: TrendingDown },
-        { label: 'Overdue', value: overdueCount, isCurrency: false, color: '#DC2626', bg: '#FEE2E2', icon: AlertTriangle },
+        { label: 'To Collect (Lent)', value: fmt(totalLent), color: '#10B981', bg: '#E6F7E4', icon: TrendingUp },
+        { label: 'To Repay (Borrowed)', value: fmt(totalBorrowed), color: '#7C5CFC', bg: '#EDEBF7', icon: TrendingDown },
+        { label: 'Overdue Loans', value: overdueCount, isCurrency: false, color: '#DC2626', bg: '#FEE2E2', icon: AlertTriangle },
       ].map((c, i) => (
         <motion.div
           key={c.label}
@@ -71,10 +74,11 @@ function SummaryCards({ loans }) {
 function LoanCard({ loan, onView, onEdit, onDelete, index }) {
   const statusCfg = getLoanStatusConfig(loan.status);
   const isLent = loan.type === 'LENT';
-  const remaining = parseFloat(loan.remainingAmount || 0);
-  const original = parseFloat(loan.originalAmount || 0);
-  const pct = original > 0 ? Math.min(100, ((original - remaining) / original) * 100) : 0;
-  const isOverdue = loan.status === 'OVERDUE';
+  const person = loan.personName || loan.borrowerName || loan.lenderName || 'Contact';
+  const remaining = parseFloat(loan.remainingAmount ?? loan.amount ?? loan.originalAmount ?? 0);
+  const original = parseFloat(loan.originalAmount ?? loan.amount ?? 0);
+  const pct = original > 0 ? Math.min(100, Math.max(0, ((original - remaining) / original) * 100)) : 0;
+  const isOverdue = loan.status === 'OVERDUE' || (loan.dueDate && new Date(loan.dueDate) < new Date() && remaining > 0);
 
   return (
     <motion.div
@@ -92,23 +96,23 @@ function LoanCard({ loan, onView, onEdit, onDelete, index }) {
         <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center flex-shrink-0 text-xs sm:text-sm font-bold ${
           isLent ? 'bg-green-50 dark:bg-green-900/20 text-green-600' : 'bg-violet-50 dark:bg-violet-900/20 text-violet-600'
         }`}>
-          {loan.personName?.[0]?.toUpperCase() || '?'}
+          {person[0]?.toUpperCase() || '?'}
         </div>
 
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 sm:gap-2 mb-1 flex-wrap">
-            <span className="text-sm font-semibold text-primary-text dark:text-white truncate">{loan.personName}</span>
+            <span className="text-sm font-semibold text-primary-text dark:text-white truncate">{person}</span>
             <span
               className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0"
               style={{ background: statusCfg.bg, color: statusCfg.text }}
             >
-              {statusCfg.label}
+              {isOverdue && loan.status !== 'OVERDUE' ? 'Overdue' : statusCfg.label}
             </span>
-            <span className={`text-[10px] sm:text-xs px-1.5 py-0.5 rounded font-medium flex-shrink-0 ${
-              isLent ? 'bg-green-50 dark:bg-green-900/20 text-green-600' : 'bg-violet-50 dark:bg-violet-900/20 text-violet-600'
+            <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${
+              isLent ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300'
             }`}>
-              {isLent ? 'Lent' : 'Borrowed'}
+              {isLent ? '💸 Lent (You get)' : '🤝 Borrowed (You owe)'}
             </span>
           </div>
 
@@ -128,16 +132,18 @@ function LoanCard({ loan, onView, onEdit, onDelete, index }) {
               <Clock size={10} />
               Due {fmtDate(loan.dueDate)}
             </span>
-            {loan.description && <span className="truncate max-w-[120px] sm:max-w-[160px]">{loan.description}</span>}
+            {(loan.description || loan.notes) && (
+              <span className="truncate max-w-[120px] sm:max-w-[160px]">{loan.description || loan.notes}</span>
+            )}
           </div>
         </div>
 
         {/* Amount + actions */}
         <div className="flex flex-col items-end gap-1 sm:gap-1.5 flex-shrink-0">
           <p className={`text-xs sm:text-sm font-bold whitespace-nowrap ${isLent ? 'text-green-600' : 'text-violet-600'}`}>
-            {fmt(loan.remainingAmount)}
+            {fmt(remaining)}
           </p>
-          <p className="text-[10px] sm:text-xs text-secondary-text whitespace-nowrap">of {fmt(loan.originalAmount)}</p>
+          <p className="text-[10px] sm:text-xs text-secondary-text whitespace-nowrap">of {fmt(original)}</p>
           <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity mt-1" onClick={(e) => e.stopPropagation()}>
             <button
               id={`edit-loan-${loan.id}`}
@@ -219,19 +225,24 @@ export default function LoansPage() {
 
     if (search) {
       const s = search.toLowerCase();
-      list = list.filter((l) =>
-        l.personName?.toLowerCase().includes(s) || l.description?.toLowerCase().includes(s)
-      );
+      list = list.filter((l) => {
+        const name = (l.personName || l.borrowerName || l.lenderName || '').toLowerCase();
+        const desc = (l.description || l.notes || '').toLowerCase();
+        return name.includes(s) || desc.includes(s);
+      });
     }
     return list;
   }, [tabLoans, search]);
 
-  const tabCounts = useMemo(() => ({
-    all: allLoans?.length || 0,
-    lent: allLoans?.filter((l) => l.type === 'LENT').length || 0,
-    borrowed: allLoans?.filter((l) => l.type === 'BORROWED').length || 0,
-    overdue: allLoans?.filter((l) => l.status === 'OVERDUE').length || 0,
-  }), [allLoans]);
+  const tabCounts = useMemo(() => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    return {
+      all: allLoans?.length || 0,
+      lent: allLoans?.filter((l) => l.type === 'LENT').length || 0,
+      borrowed: allLoans?.filter((l) => l.type === 'BORROWED').length || 0,
+      overdue: allLoans?.filter((l) => l.status === 'OVERDUE' || (l.dueDate && l.dueDate < todayStr && parseFloat(l.remainingAmount ?? l.amount ?? l.originalAmount ?? 0) > 0)).length || 0,
+    };
+  }, [allLoans]);
 
   const handleFormSuccess = () => {
     setFormOpen(false);
@@ -281,8 +292,8 @@ export default function LoansPage() {
         </div>
         <Button
           id="add-loan-btn"
-          action="lend"
           size="md"
+          leftIcon={<Plus size={16} />}
           onClick={() => { setEditingLoan(null); setFormOpen(true); }}
         >
           Add Loan
@@ -355,7 +366,7 @@ export default function LoansPage() {
       <SlidePanel
         isOpen={formOpen}
         onClose={() => { setFormOpen(false); setEditingLoan(null); }}
-        title={editingLoan ? 'Edit Loan' : 'New Loan'}
+        title={editingLoan ? 'Edit Loan' : 'Record Loan (Lend / Borrow)'}
       >
         <LoanForm
           existing={editingLoan}
@@ -368,7 +379,7 @@ export default function LoansPage() {
       <SlidePanel
         isOpen={!!viewingLoan}
         onClose={() => setViewingLoan(null)}
-        title={viewingLoan ? `${viewingLoan.personName}'s Loan` : ''}
+        title={viewingLoan ? `${viewingLoan.personName || viewingLoan.borrowerName || viewingLoan.lenderName || 'Loan'}'s Details` : ''}
         width="max-w-xl"
       >
         {viewingLoan && (
@@ -376,6 +387,11 @@ export default function LoansPage() {
             loan={viewingLoan}
             onClose={() => setViewingLoan(null)}
             onUpdate={handleLoanUpdate}
+            onEdit={(l) => {
+              setViewingLoan(null);
+              setEditingLoan(l);
+              setFormOpen(true);
+            }}
           />
         )}
       </SlidePanel>
@@ -387,7 +403,7 @@ export default function LoansPage() {
         onConfirm={handleDeleteConfirm}
         isLoading={deleting}
         title="Delete this loan?"
-        description={`This will permanently remove the loan for ${deleteTarget?.personName}. All payment history will also be deleted.`}
+        description={`This will permanently remove the loan record for ${deleteTarget?.personName || deleteTarget?.borrowerName || deleteTarget?.lenderName || 'this contact'}. All payment history will also be deleted.`}
       />
     </div>
   );
