@@ -210,7 +210,7 @@ export function RecurringExpenseForm({ existing, onSuccess, onCancel }) {
       )}
 
       {/* Actions */}
-      <div className="sticky bottom-0 bg-white dark:bg-[#13151f] pt-3 pb-2 -mx-4 sm:-mx-6 px-4 sm:px-6 border-t border-gray-200 dark:border-white/10 z-20 flex flex-row items-center gap-2.5 sm:gap-3 mt-4 shadow-lg shadow-black/10">
+      <div className="sticky bottom-0 bg-white/95 dark:bg-[#13151f]/95 backdrop-blur-md pt-3 pb-[max(env(safe-area-inset-bottom,0px),1.25rem)] -mx-4 sm:-mx-6 px-4 sm:px-6 border-t border-gray-200/80 dark:border-white/10 z-20 flex flex-row items-center gap-2.5 sm:gap-3 mt-4 shadow-[0_-4px_16px_rgba(0,0,0,0.12)]">
         <button
           type="button"
           onClick={onCancel}

@@ -3,7 +3,7 @@ import { NavLink, useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, TrendingUp, TrendingDown, HandCoins, MoreHorizontal,
-  BarChart3, User, PiggyBank, RefreshCw, CalendarDays, Bell, MessageSquare,
+  BarChart3, User, PiggyBank, RefreshCw, CalendarDays, Bell,
   Building2, Users, Wallet, Settings, X, ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -24,7 +24,7 @@ export function MobileBottomNav() {
   // Secondary routes covered by "More"
   const secondaryPaths = [
     '/reports', '/profile', '/budgets', '/recurring',
-    '/calendar', '/notifications', '/messages', '/settings',
+    '/calendar', '/notifications', '/settings',
     '/business', '/staff', '/salary'
   ];
   const isMoreActive = secondaryPaths.some((p) => location.pathname.startsWith(p));
@@ -239,17 +239,6 @@ export function MobileBottomNav() {
                       <ChevronRight size={16} className="text-gray-400" />
                     </Link>
 
-                    <Link
-                      to="/messages"
-                      onClick={() => setMoreOpen(false)}
-                      className="flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300 transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        <MessageSquare size={18} className="text-emerald-500" />
-                        <span className="font-medium">Client Messages</span>
-                      </div>
-                      <ChevronRight size={16} className="text-gray-400" />
-                    </Link>
 
                     <Link
                       to="/profile"

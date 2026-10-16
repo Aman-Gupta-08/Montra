@@ -151,10 +151,14 @@ export function SlidePanel({ isOpen, open, onClose, title, children, width = 'ma
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', stiffness: 340, damping: 36 }}
-            className={`!fixed inset-y-0 right-0 top-0 bottom-0 z-[101] bg-white dark:bg-[#13151f] text-gray-900 dark:text-white border-l border-gray-200 dark:border-white/15 shadow-2xl w-full max-w-full sm:${width} flex flex-col overscroll-contain h-full h-screen h-[100dvh]`}
+            className={`!fixed inset-x-0 bottom-0 top-0 sm:left-auto sm:right-0 z-[101] bg-white dark:bg-[#13151f] text-gray-900 dark:text-white border-l border-gray-200 dark:border-white/15 shadow-2xl w-full max-w-full sm:${width} flex flex-col overscroll-contain`}
+            style={{
+              height: '100dvh',
+              maxHeight: '100dvh',
+            }}
           >
             {/* Header with Safe Area Top */}
-            <div className="flex items-center justify-between px-4 sm:px-6 pt-[max(env(safe-area-inset-top),1.25rem)] pb-3.5 sm:pb-4 border-b border-gray-200/80 dark:border-white/10 flex-shrink-0 bg-white/95 dark:bg-[#13151f] backdrop-blur-md z-10">
+            <div className="flex items-center justify-between px-4 sm:px-6 pt-[max(env(safe-area-inset-top),1rem)] pb-3.5 sm:pb-4 border-b border-gray-200/80 dark:border-white/10 flex-shrink-0 bg-white/95 dark:bg-[#13151f] backdrop-blur-md z-10">
               <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate pr-2">{title}</h2>
               <button
                 type="button"
@@ -167,7 +171,7 @@ export function SlidePanel({ isOpen, open, onClose, title, children, width = 'ma
               </button>
             </div>
             {/* Scrollable content with Safe Area Bottom */}
-            <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-4 sm:py-5 pb-8 touch-scroll">
+            <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-4 sm:py-5 pb-[calc(env(safe-area-inset-bottom,0px)+3rem)] touch-scroll">
               {children}
             </div>
           </motion.div>

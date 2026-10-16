@@ -293,7 +293,7 @@ export default function BudgetsPage() {
   if (error) return <ErrorState message={error} onRetry={refetch} />;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4 sm:gap-6">
       {/* KPI Cards */}
       {!isLoading && budgets && <SummaryCards budgets={budgets} />}
 

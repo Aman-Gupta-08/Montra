@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, Sun, Moon, Menu, PanelLeftClose, PanelLeft, Check, CheckCheck, MessageSquare } from 'lucide-react';
+import { Bell, Sun, Moon, Menu, PanelLeftClose, PanelLeft, Check, CheckCheck } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { notificationService } from '../../services/dashboardService';
@@ -201,18 +201,6 @@ export function TopNavbar({ pageTitle, onMenuToggle, sidebarCollapsed, onSidebar
           {isDark ? <Sun size={17} className="text-amber-400" /> : <Moon size={17} className="text-violet-600" />}
         </button>
 
-        {/* Messages quick launcher */}
-        <Link
-          to="/messages"
-          id="top-messages-btn"
-          className="hidden xs:flex glass-1 relative w-8 h-8 sm:w-9 sm:h-9 rounded-xl items-center justify-center text-gray-700 dark:text-gray-300 hover:scale-105 active:scale-95 transition-all cursor-pointer"
-          aria-label="Client Messages"
-          title="Client Messages"
-        >
-          <MessageSquare size={16} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 shadow-xs" />
-        </Link>
-
         {/* Notifications */}
         <div ref={notifRef} className="relative">
           <button
@@ -318,14 +306,6 @@ function UserMenuDropdown({ user, avatarColor }) {
                 className="w-full text-left px-3 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center gap-2"
               >
                 Profile
-              </Link>
-              <Link
-                to="/messages"
-                id="menu-messages-link"
-                onClick={() => setOpen(false)}
-                className="w-full text-left px-3 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center gap-2"
-              >
-                Messages
               </Link>
               <Link
                 to="/settings"

@@ -41,7 +41,7 @@ function SummaryCards({ loans }) {
   const overdueCount = useMemo(() => loans.filter((l) => l.status === 'OVERDUE').length, [loans]);
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4">
+    <div className="grid grid-cols-3 gap-2 sm:gap-4">
       {[
         { label: 'Total Lent', value: fmt(totalLent), color: '#10B981', bg: '#E6F7E4', icon: TrendingUp },
         { label: 'Total Borrowed', value: fmt(totalBorrowed), color: '#7C5CFC', bg: '#EDEBF7', icon: TrendingDown },
@@ -52,16 +52,14 @@ function SummaryCards({ loans }) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.05 }}
-          className={`bg-white/70 dark:bg-black/40 backdrop-blur-xl rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-gray-200/60 dark:border-white/10 shadow-sm flex flex-col sm:flex-row items-start gap-2 sm:gap-3 min-w-0 ${
-            i === 2 ? 'col-span-2 sm:col-span-1' : ''
-          }`}
+          className="bg-white/70 dark:bg-black/40 backdrop-blur-xl rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-gray-200/60 dark:border-white/10 shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-3 min-w-0"
         >
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: c.bg }}>
-            <c.icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: c.color }} />
+          <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: c.bg }}>
+            <c.icon className="w-3.5 h-3.5 sm:w-5 sm:h-5" style={{ color: c.color }} />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] sm:text-xs font-medium text-secondary-text mb-0.5 truncate">{c.label}</p>
-            <p className="text-xs sm:text-base md:text-lg font-bold truncate" style={{ color: c.color }}>{c.value}</p>
+            <p className="text-[10px] xs:text-[11px] sm:text-xs font-medium text-secondary-text mb-0.5 truncate">{c.label}</p>
+            <p className="text-xs xs:text-sm sm:text-base md:text-lg font-bold truncate" style={{ color: c.color }}>{c.value}</p>
           </div>
         </motion.div>
       ))}
@@ -264,7 +262,7 @@ export default function LoansPage() {
   if (error) return <ErrorState message={error} onRetry={refetch} />;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4 sm:gap-6">
       {/* Summary */}
       {!isLoading && allLoans && <SummaryCards loans={allLoans} />}
 

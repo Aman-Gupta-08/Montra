@@ -5,7 +5,6 @@ import {
   LayoutDashboard, TrendingUp, TrendingDown, RefreshCw,
   HandCoins, PiggyBank, CalendarDays, BarChart3,
   Bell, User, Settings, LogOut, Building2, Users, Wallet, X,
-  MessageSquare,
 } from 'lucide-react';
 import { MontraLogo } from '../common/Logo';
 import { AnimatedButton } from '../common/Button';
@@ -22,7 +21,6 @@ const BASE_NAV = [
   { label: 'Calendar', icon: CalendarDays, path: '/calendar' },
   { label: 'Reports', icon: BarChart3, path: '/reports' },
   { label: 'Notifications', icon: Bell, path: '/notifications' },
-  { label: 'Messages', icon: MessageSquare, path: '/messages', badge: '6' },
 ];
 
 const BUSINESS_NAV = [

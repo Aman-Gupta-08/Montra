@@ -15,7 +15,6 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 // Authenticated pages (lazy)
 const DashboardPage    = lazy(() => import('./pages/DashboardPage'));
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'));
-const MessagesPage      = lazy(() => import('./pages/MessagesPage'));
 const IncomePage       = lazy(() => import('./pages/IncomePage'));
 const ExpensesPage     = lazy(() => import('./pages/ExpensesPage'));
 const RecurringPage    = lazy(() => import('./pages/RecurringPage'));
@@ -100,8 +99,6 @@ function AppRoutes() {
       {/* Authenticated: notifications */}
       <Route path="/notifications" element={<AuthLayout><NotificationsPage /></AuthLayout>} />
 
-      {/* Authenticated: client messages */}
-      <Route path="/messages" element={<AuthLayout><MessagesPage /></AuthLayout>} />
 
       {/* Authenticated: income */}
       <Route path="/income" element={<AuthLayout><IncomePage /></AuthLayout>} />

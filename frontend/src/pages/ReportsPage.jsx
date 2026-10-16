@@ -176,7 +176,7 @@ export default function ReportsPage() {
   if (error) return <ErrorState message={error} onRetry={refetch} />;
 
   return (
-    <div className="flex flex-col gap-6 max-w-7xl mx-auto w-full">
+    <div className="flex flex-col gap-4 sm:gap-6 max-w-7xl mx-auto w-full">
       {/* ─── Top Control Toolbar: Title, Date Filter & Export ─── */}
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 bg-white dark:bg-gray-900 rounded-2xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm">
         <div>

@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import KineticGrid from "@/components/ui/kinetic-grid";
-import DefaultDemo from "@/demos/default";
 import ButtonWithIconDemo from "@/components/ui/button-with-icon";
 import ShinyButtonDemo from "@/components/ui/shiny-button-demo";
 import MotionFooterDemo from "@/components/ui/motion-footer-demo";
 
 export default function Default() {
-  const [activeTab, setActiveTab] = useState<"shiny" | "footer" | "buttons" | "messages">("shiny");
+  const [activeTab, setActiveTab] = useState<"shiny" | "footer" | "buttons">("shiny");
 
   return (
     <KineticGrid>
@@ -57,17 +56,6 @@ export default function Default() {
               >
                 Filter Pills
               </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab("messages")}
-                className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 cursor-pointer ${
-                  activeTab === "messages"
-                    ? "bg-[#1b2536] text-[#b8a6f8] shadow-md border border-[#27354d]/60"
-                    : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5"
-                }`}
-              >
-                Messages
-              </button>
             </div>
 
             <a
@@ -101,36 +89,6 @@ export default function Default() {
         {activeTab === "buttons" && (
           <div className="w-full flex justify-center py-4">
             <ButtonWithIconDemo />
-          </div>
-        )}
-
-        {/* Tab 4: Messages Sidebar */}
-        {activeTab === "messages" && (
-          <div className="flex flex-col lg:flex-row items-center justify-center p-4 gap-8 w-full">
-            <div className="max-w-md text-left text-white">
-              <span className="mb-3 inline-block rounded-full border border-violet-400/30 bg-violet-500/10 px-3 py-1 text-xs font-semibold tracking-wide text-violet-300">
-                21st.dev Component
-              </span>
-              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-white">
-                Client Messages Sidebar
-              </h2>
-              <p className="mt-3 text-sm text-white/70 leading-relaxed">
-                A premium glassmorphic client messages sidebar with search, favorites filtering,
-                active indicator glow, and avatar status.
-              </p>
-              <div className="mt-6 flex items-center gap-3">
-                <a
-                  href="/messages"
-                  className="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs shadow-lg shadow-violet-500/30 transition-all"
-                >
-                  Open Full Messages App →
-                </a>
-              </div>
-            </div>
-
-            <div className="w-full max-w-sm h-[560px]">
-              <DefaultDemo />
-            </div>
           </div>
         )}
       </div>

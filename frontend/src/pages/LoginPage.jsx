@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Mail, Lock, Eye, EyeOff, ShieldCheck, KeyRound,
-  TrendingUp, ArrowRight, Check, Sparkles, Sun, Moon,
+  TrendingUp, ArrowRight, Check, Sun, Moon,
 } from 'lucide-react';
 import { MontraLogo } from '../components/common/Logo';
 import { useAuth } from '../context/AuthContext';
@@ -11,7 +11,6 @@ import { useTheme } from '../context/ThemeContext';
 import FluidMeshShader from '../components/ui/fluid-mesh-shader';
 import { FinanceHeroAnimation } from '../components/common/FinanceHeroAnimation';
 import { AnimatedButton } from '../components/common/Button';
-import { ButtonShowcaseModal } from '../components/common/ButtonShowcaseModal';
 
 /* ─── Validation ─── */
 function validate({ emailOrPhone, email, password }) {
@@ -40,7 +39,6 @@ export default function LoginPage() {
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
-  const [showcaseOpen, setShowcaseOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('signin'); // 'signin' | 'signup'
   const [form, setForm] = useState({
     email: '',
@@ -163,17 +161,6 @@ export default function LoginPage() {
             256-bit
           </span>
 
-          {/* Showcase Button */}
-          <button
-            type="button"
-            id="open-showcase-btn"
-            onClick={() => setShowcaseOpen(true)}
-            className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/30 text-xs font-semibold text-violet-700 dark:text-violet-300 shadow-xs backdrop-blur-md transition-all cursor-pointer"
-          >
-            <Sparkles size={13} className="text-amber-500" />
-            <span className="hidden xs:inline">19 Motion Buttons</span>
-            <span className="xs:hidden">Buttons</span>
-          </button>
 
           {/* Theme Toggle Button (Sun / Moon) */}
           <button
@@ -515,11 +502,6 @@ export default function LoginPage() {
         </div>
       </footer>
 
-      {/* Button Design System Interactive Showcase */}
-      <ButtonShowcaseModal
-        isOpen={showcaseOpen}
-        onClose={() => setShowcaseOpen(false)}
-      />
     </FluidMeshShader>
   );
 }
